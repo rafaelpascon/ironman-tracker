@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="IM 2027">
+    <meta name="theme-color" content="#0a0a1a">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+    <title>Iron Man 2027 Tracker</title>
+    <link rel="stylesheet" href="./style.css">
+    <script>
+    !function(){var c=document.createElement('canvas');c.width=c.height=180;var x=c.getContext('2d');
+    x.fillStyle='#0a0a1a';x.fillRect(0,0,180,180);
+    x.fillStyle='#ff6b35';x.font='900 68px Arial';x.textAlign='center';x.textBaseline='middle';x.fillText('IM',90,72);
+    x.fillStyle='#4facfe';x.font='700 26px Arial';x.fillText('2027',90,130);
+    var l=document.createElement('link');l.rel='apple-touch-icon';l.href=c.toDataURL();document.head.appendChild(l)}();
+    </script>
+</head>
+<body>
+    <!-- Loading -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Login -->
+    <div id="login-screen" class="login-screen hidden">
+        <div class="login-container">
+            <div class="login-logo">
+                <span class="logo-im">IM</span>
+                <span class="logo-year">2027</span>
+            </div>
+            <p class="login-title">Iron Man Tracker</p>
+            <form id="login-form">
+                <input type="email" id="email" placeholder="Email" autocomplete="email" required>
+                <input type="password" id="password" placeholder="Senha" autocomplete="current-password" required>
+                <button type="submit" class="btn-primary" id="auth-btn">Entrar</button>
+                <p id="login-error" class="error-text"></p>
+                <p class="auth-toggle"><a href="#" id="toggle-auth">Criar conta</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- App -->
+    <div id="app" class="hidden">
+        <header class="header">
+            <span class="app-title">Iron Man 2027</span>
+            <div class="header-right">
+                <div class="streak-badge">
+                    <span class="streak-fire">🔥</span>
+                    <span id="streak-count">0</span>
+                </div>
+                <button id="logout-btn" class="btn-logout" title="Sair">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Tab: Dashboard -->
+        <div id="tab-dashboard" class="tab-content">
+            <section class="section">
+                <p class="section-date" id="today-date"></p>
+                <p class="today-phase" id="today-phase"></p>
+                <div id="today-card" class="today-card">
+                    <div class="today-icon" id="today-icon"></div>
+                    <h2 class="today-name" id="today-name"></h2>
+                    <p class="today-duration" id="today-duration"></p>
+                    <p class="today-rest-msg hidden" id="today-rest-msg">Aproveite o descanso! 😴</p>
+                    <div id="workout-data" class="workout-data hidden"></div>
+                    <button id="complete-btn" class="btn-complete hidden">CONCLUIR ✓</button>
+                </div>
+            </section>
+
+            <!-- Next cards -->
+            <section class="section next-cards-section">
+                <div class="next-card achieve hidden" id="next-achieve-card" data-tab="achievements">
+                    <span class="next-icon" id="next-achieve-icon"></span>
+                    <div class="next-info">
+                        <p class="next-label">Próximo marco</p>
+                        <p class="next-name" id="next-achieve-name"></p>
+                        <p class="next-desc" id="next-achieve-desc"></p>
+                    </div>
+                    <span class="next-arrow">→</span>
+                </div>
+                <div class="next-card race hidden" id="next-race-card" data-tab="races">
+                    <span class="next-icon">🏁</span>
+                    <div class="next-info">
+                        <p class="next-label">Próxima prova</p>
+                        <p class="next-name" id="next-race-name"></p>
+                        <p class="next-countdown" id="next-race-countdown"></p>
+                    </div>
+                    <span class="next-arrow">→</span>
+                </div>
+            </section>
+
+            <!-- Distance tracker -->
+            <section id="distance-section" class="section hidden">
+                <h3 class="section-title">Distâncias Acumuladas</h3>
+                <div class="dist-grid">
+                    <div class="dist-card">
+                        <span class="dist-icon">🏊</span>
+                        <div class="dist-info">
+                            <span class="dist-val" id="dist-swim-val">0.0</span>
+                            <span class="dist-unit">km</span>
+                            <span class="dist-target" id="dist-swim-target"></span>
+                        </div>
+                        <div class="dist-bar"><div class="dist-fill swim-fill" id="dist-swim-fill"></div></div>
+                    </div>
+                    <div class="dist-card">
+                        <span class="dist-icon">🚴</span>
+                        <div class="dist-info">
+                            <span class="dist-val" id="dist-bike-val">0.0</span>
+                            <span class="dist-unit">km</span>
+                            <span class="dist-target" id="dist-bike-target"></span>
+                        </div>
+                        <div class="dist-bar"><div class="dist-fill bike-fill" id="dist-bike-fill"></div></div>
+                    </div>
+                    <div class="dist-card">
+                        <span class="dist-icon">🏃</span>
+                        <div class="dist-info">
+                            <span class="dist-val" id="dist-run-val">0.0</span>
+                            <span class="dist-unit">km</span>
+                            <span class="dist-target" id="dist-run-target"></span>
+                        </div>
+                        <div class="dist-bar"><div class="dist-fill run-fill" id="dist-run-fill"></div></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Week -->
+            <section class="section">
+                <h3 class="section-title">Esta Semana</h3>
+                <div id="week-days" class="week-days"></div>
+            </section>
+
+            <!-- Month -->
+            <section class="section">
+                <h3 class="section-title" id="month-name"></h3>
+                <div class="month-summary">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="month-bar-fill"></div>
+                    </div>
+                    <div class="month-stats">
+                        <span id="month-count"></span>
+                        <span id="month-percentage" class="month-percentage"></span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Tab: Phases -->
+        <div id="tab-phases" class="tab-content hidden">
+            <div id="phases-list" class="phases-list"></div>
+        </div>
+
+        <!-- Tab: Achievements -->
+        <div id="tab-achievements" class="tab-content hidden">
+            <div id="achievements-list" class="achievements-list"></div>
+        </div>
+
+        <!-- Tab: Races -->
+        <div id="tab-races" class="tab-content hidden">
+            <div id="races-list" class="races-list"></div>
+        </div>
+
+        <!-- Bottom Nav -->
+        <nav class="bottom-nav">
+            <button class="nav-tab active" data-tab="dashboard">
+                <span class="nav-icon">🏠</span><span class="nav-label">Hoje</span>
+            </button>
+            <button class="nav-tab" data-tab="phases">
+                <span class="nav-icon">📊</span><span class="nav-label">Fases</span>
+            </button>
+            <button class="nav-tab" data-tab="achievements">
+                <span class="nav-icon">🏆</span><span class="nav-label">Conquistas</span>
+            </button>
+            <button class="nav-tab" data-tab="races">
+                <span class="nav-icon">🏁</span><span class="nav-label">Provas</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Workout Modal -->
+    <div id="workout-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <h3 class="modal-title" id="wm-title">Log de Treino</h3>
+            <div id="wm-section1">
+                <p class="wm-section-label" id="wm-label1"></p>
+                <div class="modal-field">
+                    <label id="wm-dlabel1">Distância</label>
+                    <input type="number" id="wm-d1" placeholder="ex: 1500" min="0" inputmode="decimal" step="any">
+                </div>
+                <div class="modal-field">
+                    <label>Tempo (minutos)</label>
+                    <input type="number" id="wm-t1" placeholder="ex: 35" min="0" inputmode="numeric">
+                </div>
+            </div>
+            <div id="wm-section2" class="hidden">
+                <p class="wm-section-label" id="wm-label2"></p>
+                <div class="modal-field">
+                    <label id="wm-dlabel2">Distância</label>
+                    <input type="number" id="wm-d2" placeholder="ex: 5" min="0" inputmode="decimal" step="any">
+                </div>
+                <div class="modal-field">
+                    <label>Tempo (minutos)</label>
+                    <input type="number" id="wm-t2" placeholder="ex: 30" min="0" inputmode="numeric">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="wm-save" class="btn-primary">Salvar</button>
+                <button id="wm-skip" class="btn-secondary">Pular dados</button>
+                <button id="wm-cancel" class="btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievement Modal -->
+    <div id="achieve-modal" class="modal-overlay hidden">
+        <div class="modal modal-center">
+            <div class="am-icon" id="am-icon"></div>
+            <h3 class="modal-title" id="am-name"></h3>
+            <p class="am-desc" id="am-desc"></p>
+            <div class="modal-actions">
+                <button id="achieve-confirm" class="btn-primary">Concluir Conquista</button>
+                <button id="achieve-cancel" class="btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Race Result Modal -->
+    <div id="race-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <h3 class="modal-title" id="rm-name">Resultado da Prova</h3>
+            <div class="modal-field">
+                <label for="race-time">Tempo total</label>
+                <input type="text" id="race-time" placeholder="ex: 02:15:30" inputmode="text">
+            </div>
+            <div class="modal-field">
+                <label for="race-notes">Observações</label>
+                <input type="text" id="race-notes" placeholder="Como foi?">
+            </div>
+            <div class="modal-actions">
+                <button id="race-save" class="btn-primary">Salvar Resultado</button>
+                <button id="race-cancel" class="btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration -->
+    <div id="celebration" class="celebration hidden">
+        <div class="celeb-content">
+            <span class="celeb-icon" id="celeb-icon"></span>
+            <h2 class="celeb-title" id="celeb-title"></h2>
+            <p class="celeb-desc" id="celeb-desc"></p>
+        </div>
+    </div>
+
+    <!-- FAB -->
+    <button id="fab" class="fab hidden" aria-label="Concluir treino">✓</button>
+
+    <!-- Undo Toast -->
+    <div id="undo-toast" class="undo-toast hidden">
+        <span>Treino concluído!</span>
+        <button id="undo-btn" class="btn-undo">Desfazer</button>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "Iron Man 2027 Tracker",
+  "short_name": "IM 2027",
+  "description": "Acompanhe seu treino de preparação para o Iron Man 2027",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0a1a",
+  "theme_color": "#0a0a1a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
