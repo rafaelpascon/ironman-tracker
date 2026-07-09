@@ -1,7 +1,7 @@
 {
-  "name": "Iron Man 2027 Tracker",
-  "short_name": "IM 2027",
-  "description": "Acompanhe seu treino de preparação para o Iron Man 2027",
+  "name": "IronFit — Treino & Evolução",
+  "short_name": "IronFit",
+  "description": "Treino, força, natação, bike, corrida e gamificação — tudo em um só app",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0a0a1a",

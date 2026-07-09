@@ -1,4 +1,4 @@
-const CACHE = 'ironman-v2';
+const CACHE = 'ironfit-v1';
 const SHELL = [
   './',
   './index.html',
