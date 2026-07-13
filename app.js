@@ -1233,9 +1233,11 @@ async function handleUndo() {
   if (undoTimeout) clearTimeout(undoTimeout);
   toast.classList.add('hidden');
   delete cachedSessoes[id];
+  recomputarGamificacao();
   renderAll();
   if (currentTab === 'treinos') renderTreinosTab();
   await db.collection('users').doc(currentUser.uid).collection('sessoes').doc(id).delete();
+  await saveGamificacao();
 }
 
 function animateFeedback() {
@@ -1412,6 +1414,18 @@ async function saveGamificacao() {
   await db.collection('users').doc(currentUser.uid).collection('gamificacao').doc('estado').set(gamificacao);
 }
 
+// Recalcula XP, streak, ranks e proximoIndiceForca do zero a partir do histórico de sessões
+// restante. Chamado sempre que uma sessão é apagada, para que ranks/streak/XP não fiquem
+// "presos" num valor que não reflete mais os dados reais. Conquistas nunca são revogadas —
+// uma vez desbloqueadas, permanecem (como na maioria dos apps de gamificação).
+function recomputarGamificacao() {
+  const conquistasExistentes = gamificacao.conquistas || {};
+  gamificacao = defaultGamificacao();
+  gamificacao.conquistas = conquistasExistentes;
+  const sessoesOrdenadas = Object.values(cachedSessoes).slice().sort((a, b) => new Date(a.data) - new Date(b.data));
+  sessoesOrdenadas.forEach(s => updateGamificacaoAfterSessao(s, true));
+}
+
 // ╔══════════════════════════════════════════════════════════════╗
 // ║  TAB: Treinos (histórico)                                       ║
 // ╚══════════════════════════════════════════════════════════════╝
@@ -1456,9 +1470,12 @@ function renderTreinoCard(id, s) {
 async function deleteSessao(id) {
   if (!confirm('Excluir este treino? Isso não pode ser desfeito.')) return;
   delete cachedSessoes[id];
+  recomputarGamificacao();
   renderTreinosTab();
   renderAll();
+  if (currentTab === 'evolucao') renderEvolucaoTab();
   await db.collection('users').doc(currentUser.uid).collection('sessoes').doc(id).delete();
+  await saveGamificacao();
 }
 
 // ╔══════════════════════════════════════════════════════════════╗
