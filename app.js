@@ -37,23 +37,38 @@ const DISCIPLINE_RANK_KM = {
 
 // ═══ Biblioteca de exercícios padrão ═══
 const EXERCICIOS_DEFAULT = [
-  { id: 'agachamento-livre', nome: 'Agachamento livre', grupo: 'pernas', tipo: 'composto' },
-  { id: 'supino-reto', nome: 'Supino reto', grupo: 'peito', tipo: 'composto' },
-  { id: 'levantamento-terra', nome: 'Levantamento terra', grupo: 'costas', tipo: 'composto' },
-  { id: 'barra-fixa', nome: 'Barra fixa', grupo: 'costas', tipo: 'composto' },
-  { id: 'desenvolvimento-militar', nome: 'Desenvolvimento militar', grupo: 'ombros', tipo: 'composto' },
-  { id: 'remada-curvada', nome: 'Remada curvada', grupo: 'costas', tipo: 'composto' },
-  { id: 'afundo', nome: 'Afundo (passada)', grupo: 'pernas', tipo: 'composto' },
-  { id: 'elevacao-pelvica', nome: 'Elevação pélvica', grupo: 'pernas', tipo: 'composto' },
-  { id: 'supino-inclinado', nome: 'Supino inclinado', grupo: 'peito', tipo: 'composto' },
-  { id: 'paralelas', nome: 'Paralelas (dips)', grupo: 'peito', tipo: 'composto' },
-  { id: 'rosca-direta', nome: 'Rosca direta', grupo: 'bracos', tipo: 'isolado' },
-  { id: 'triceps-testa', nome: 'Tríceps testa', grupo: 'bracos', tipo: 'isolado' },
-  { id: 'elevacao-lateral', nome: 'Elevação lateral', grupo: 'ombros', tipo: 'isolado' },
-  { id: 'prancha', nome: 'Prancha', grupo: 'core', tipo: 'isolado' },
-  { id: 'abdominal-remador', nome: 'Abdominal remador', grupo: 'core', tipo: 'isolado' },
-  { id: 'panturrilha-em-pe', nome: 'Panturrilha em pé', grupo: 'pernas', tipo: 'isolado' },
-  { id: 'face-pull', nome: 'Face pull', grupo: 'ombros', tipo: 'isolado' }
+  { id: 'agachamento-livre', nome: 'Agachamento livre', grupo: 'pernas', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'supino-reto', nome: 'Supino reto', grupo: 'peito', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'levantamento-terra', nome: 'Levantamento terra', grupo: 'costas', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'barra-fixa', nome: 'Barra fixa', grupo: 'costas', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'desenvolvimento-militar', nome: 'Desenvolvimento militar', grupo: 'ombros', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'remada-curvada', nome: 'Remada curvada', grupo: 'costas', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'afundo', nome: 'Afundo (passada)', grupo: 'pernas', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'elevacao-pelvica', nome: 'Elevação pélvica', grupo: 'pernas', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'supino-inclinado', nome: 'Supino inclinado', grupo: 'peito', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'paralelas', nome: 'Paralelas (dips)', grupo: 'peito', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'rosca-direta', nome: 'Rosca direta', grupo: 'bracos', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'triceps-testa', nome: 'Tríceps testa', grupo: 'bracos', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'elevacao-lateral', nome: 'Elevação lateral', grupo: 'ombros', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'prancha', nome: 'Prancha', grupo: 'core', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'abdominal-remador', nome: 'Abdominal remador', grupo: 'core', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'panturrilha-em-pe', nome: 'Panturrilha em pé', grupo: 'pernas', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'face-pull', nome: 'Face pull', grupo: 'ombros', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'voador-peitoral', nome: 'Voador peitoral (peck deck)', grupo: 'peito', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'crucifixo-cross-over', nome: 'Crucifixo no cross-over', grupo: 'peito', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'chest-fly-maquina', nome: 'Chest fly (máquina)', grupo: 'peito', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'chest-press-maquina', nome: 'Chest press (máquina)', grupo: 'peito', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'triceps-corda', nome: 'Tríceps corda', grupo: 'bracos', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'triceps-frances', nome: 'Tríceps francês', grupo: 'bracos', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'rosca-scott', nome: 'Rosca Scott', grupo: 'bracos', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'puxada-frontal', nome: 'Puxada frontal', grupo: 'costas', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'remada-sentada', nome: 'Remada sentada', grupo: 'costas', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'puxada-fechada-triangulo', nome: 'Puxada fechada (triângulo)', grupo: 'costas', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'desenvolvimento-ombros-maquina', nome: 'Desenvolvimento de ombros (máquina)', grupo: 'ombros', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'iso-lateral-shoulder-press', nome: 'Iso lateral shoulder press', grupo: 'ombros', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'leg-press-45', nome: 'Leg press 45°', grupo: 'pernas', tipo: 'composto', classificacao: 'Composto' },
+  { id: 'cadeira-extensora', nome: 'Cadeira extensora', grupo: 'pernas', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'cadeira-flexora', nome: 'Cadeira flexora', grupo: 'pernas', tipo: 'isolado', classificacao: 'Isolado' }
 ];
 
 // ═══ Plano de Força — estilo Anatoly (todos os usuários) ═══
@@ -92,6 +107,29 @@ const PLANO_FORCA_ANATOLY = {
         { exercicioId: 'elevacao-lateral', series: 3, repsMin: 10, repsMax: 15 }
       ],
       mobilidade: ['Mobilidade de quadril — 10 min']
+    }
+  ]
+};
+
+// ═══ Plano de Emagrecimento — circuito full-body ═══
+const PLANO_EMAGRECIMENTO_SEED = {
+  nome: 'Emagrecimento — Bloco 1',
+  descricao: 'Circuito full-body 3x/semana, foco em volume moderado e gasto calórico — não em carga máxima.',
+  duracaoSemanas: 4,
+  diasSemana: [1, 3, 5],
+  progressao: 'aumentar reps até o topo da faixa antes de aumentar carga; priorizar completar o circuito com menos descanso ao longo das semanas',
+  sequencia: [
+    {
+      nome: 'Circuito Full Body',
+      exercicios: [
+        { exercicioId: 'agachamento-livre', series: 3, repsMin: 12, repsMax: 15, descansoSeg: 45 },
+        { exercicioId: 'remada-sentada', series: 3, repsMin: 12, repsMax: 15, descansoSeg: 45 },
+        { exercicioId: 'leg-press-45', series: 3, repsMin: 12, repsMax: 15, descansoSeg: 45 },
+        { exercicioId: 'desenvolvimento-ombros-maquina', series: 3, repsMin: 12, repsMax: 15, descansoSeg: 45 },
+        { exercicioId: 'cadeira-extensora', series: 2, repsMin: 15, repsMax: 15, descansoSeg: 30 },
+        { exercicioId: 'cadeira-flexora', series: 2, repsMin: 15, repsMax: 15, descansoSeg: 30 }
+      ],
+      mobilidade: []
     }
   ]
 };
@@ -209,6 +247,7 @@ let cachedProvas = {};
 let cachedExercicios = {};
 let gamificacao = null;
 let planoForca = null;
+let planoEmagrecimento = null;
 let planoIronman = null;
 let currentTab = 'hoje';
 let isSignUp = false;
@@ -277,13 +316,32 @@ async function loadAllData() {
   EXERCICIOS_DEFAULT.forEach(e => cachedExercicios[e.id] = e);
   exSnap.forEach(d => cachedExercicios[d.id] = { id: d.id, ...d.data() });
   cachedProvas = {}; provaSnap.forEach(d => cachedProvas[d.id] = d.data());
-  planoForca = null; planoIronman = null;
+  planoForca = null; planoEmagrecimento = null; planoIronman = null;
   planSnap.forEach(d => {
     const data = d.data();
     if (data.tipo === 'forca') planoForca = { id: d.id, ...data };
+    else if (data.tipo === 'emagrecimento') planoEmagrecimento = { id: d.id, ...data };
     else if (data.tipo === 'ironman') planoIronman = { id: d.id, ...data };
   });
   gamificacao = gamifSnap.exists ? gamifSnap.data() : defaultGamificacao();
+  await garantirPlanoDoObjetivo();
+}
+
+// Migração/self-heal: garante que o plano correspondente ao objetivo do usuário exista
+// (cobre contas criadas antes desta atualização, ou troca de objetivo sem o plano seedado).
+async function garantirPlanoDoObjetivo() {
+  const userRef = db.collection('users').doc(currentUser.uid);
+  // planoForca serve tanto o objetivo "força" quanto o overlay híbrido do modo Ironman
+  if ((profile.objetivo === 'forca' || profile.modoIronman) && !planoForca) {
+    const rec = { tipo: 'forca', ...PLANO_FORCA_ANATOLY };
+    await userRef.collection('planos').doc('forca-anatoly').set(rec);
+    planoForca = { id: 'forca-anatoly', ...rec };
+  }
+  if (profile.objetivo === 'emagrecimento' && !planoEmagrecimento) {
+    const rec = { tipo: 'emagrecimento', ...PLANO_EMAGRECIMENTO_SEED };
+    await userRef.collection('planos').doc('emagrecimento-bloco1').set(rec);
+    planoEmagrecimento = { id: 'emagrecimento-bloco1', ...rec };
+  }
 }
 
 function defaultGamificacao() {
@@ -465,6 +523,7 @@ async function seedNewUser(uid, prof, modoIronman) {
   const batch = db.batch();
   batch.set(userRef.collection('profile').doc('data'), prof);
   batch.set(userRef.collection('planos').doc('forca-anatoly'), { tipo: 'forca', ...PLANO_FORCA_ANATOLY });
+  batch.set(userRef.collection('planos').doc('emagrecimento-bloco1'), { tipo: 'emagrecimento', ...PLANO_EMAGRECIMENTO_SEED });
   batch.set(userRef.collection('gamificacao').doc('estado'), defaultGamificacao());
   if (modoIronman) {
     batch.set(userRef.collection('planos').doc('ironman-2027'), { tipo: 'ironman', ...PLANO_IRONMAN_SEED });
@@ -498,6 +557,8 @@ async function handleProfileUpdate() {
     RACES_SEED.forEach(r => batch.set(userRef.collection('provas').doc(r.id), r));
     await batch.commit();
     await loadAllData();
+  } else {
+    await garantirPlanoDoObjetivo();
   }
   applyModeVisibility();
   const msg = document.getElementById('cfg-saved-msg');
@@ -545,9 +606,19 @@ function getFaseParaData(date) {
 }
 function getFaseAtual() { return getFaseParaData(new Date()); }
 
-function getProximoDiaForca() {
-  const idx = (gamificacao.proximoIndiceForca || 0) % planoForca.sequencia.length;
-  return planoForca.sequencia[idx];
+// Plano de resistência (força/emagrecimento) ativo para o objetivo do usuário, fora do modo Ironman.
+// O modo Ironman sempre usa planoForca especificamente para o overlay híbrido (chamadores passam o plano direto).
+function getPlanoResistenciaAtivo() {
+  if (profile.objetivo === 'forca') return planoForca;
+  if (profile.objetivo === 'emagrecimento') return planoEmagrecimento;
+  return null;
+}
+
+function getProximoDiaForca(plano) {
+  const p = plano || getPlanoResistenciaAtivo();
+  if (!p || !p.sequencia || !p.sequencia.length) return null;
+  const idx = (gamificacao.proximoIndiceForca || 0) % p.sequencia.length;
+  return p.sequencia[idx];
 }
 
 function isDiaPrescrito(date) {
@@ -558,14 +629,15 @@ function isDiaPrescrito(date) {
     if (fase.forcaDias && fase.forcaDias.includes(weekday)) return true;
     return false;
   }
-  return !!(planoForca && planoForca.diasSemana.includes(weekday));
+  const plano = getPlanoResistenciaAtivo();
+  return !!(plano && plano.diasSemana.includes(weekday));
 }
 function isRestDay(date) { return !isDiaPrescrito(date); }
 
-function getDiaForcaParaBloco(dateStr) {
+function getDiaForcaParaBloco(dateStr, plano) {
   const sessaoHoje = Object.values(cachedSessoes).find(s => s.tipo === 'forca' && s.data === dateStr);
   if (sessaoHoje) return { nome: sessaoHoje.planoDia || 'Força', exercicios: [], mobilidade: [] };
-  return getProximoDiaForca();
+  return getProximoDiaForca(plano);
 }
 
 function computeTodayBlocks(date) {
@@ -577,14 +649,18 @@ function computeTodayBlocks(date) {
     const sched = fase.schedule[weekday];
     blocks.push({ tipo: sched.tipo, nome: sched.nome, duracao: sched.duracao, icon: sched.icon, subs: sched.subs || null, diaForca: null });
     if (fase.forcaDias && fase.forcaDias.includes(weekday) && planoForca) {
-      const dia = getDiaForcaParaBloco(dateStr);
+      const dia = getDiaForcaParaBloco(dateStr, planoForca);
       blocks.push({ tipo: 'forca', nome: dia.nome, duracao: null, icon: '\u{1F4AA}', subs: null, diaForca: dia });
     }
-  } else if (planoForca && planoForca.diasSemana.includes(weekday)) {
-    const dia = getDiaForcaParaBloco(dateStr);
-    blocks.push({ tipo: 'forca', nome: dia.nome, duracao: null, icon: '\u{1F4AA}', subs: null, diaForca: dia });
   } else {
-    blocks.push({ tipo: 'rest', nome: 'Descanso', duracao: null, icon: '\u{1F634}', subs: null, diaForca: null });
+    const plano = getPlanoResistenciaAtivo();
+    if (plano && plano.diasSemana.includes(weekday)) {
+      const dia = getDiaForcaParaBloco(dateStr, plano);
+      const icon = profile.objetivo === 'emagrecimento' ? '\u{1F525}' : '\u{1F4AA}';
+      blocks.push({ tipo: 'forca', nome: dia.nome, duracao: null, icon, subs: null, diaForca: dia });
+    } else {
+      blocks.push({ tipo: 'rest', nome: 'Descanso', duracao: null, icon: '\u{1F634}', subs: null, diaForca: null });
+    }
   }
   return blocks;
 }
@@ -630,7 +706,8 @@ function renderTodayBlockCard(b, idx, dateStr) {
   } else if (done) {
     html += '<button class="btn-complete done-btn">✓ Concluído!</button>';
   } else {
-    html += '<button class="btn-complete ' + b.tipo + '-btn" data-complete-block="' + idx + '">CONCLUIR ✓</button>';
+    const label = b.tipo === 't25' ? 'CONCLUIR ✓' : 'INICIAR TREINO ▶';
+    html += '<button class="btn-complete ' + b.tipo + '-btn" data-complete-block="' + idx + '">' + label + '</button>';
   }
   html += '</div>';
   return html;
@@ -753,9 +830,17 @@ function buildSessionForm(tipo, prefill) {
   document.getElementById('sm-title').textContent = (TIPO_ICONS[tipo] || '') + ' Registrar ' + TIPO_LABELS[tipo];
   if (tipo === 'forca') {
     if (prefill && prefill.exercicios) {
-      smForcaExercicios = prefill.exercicios.map(e => ({ exercicioId: e.exercicioId, series: e.series.map(s => ({ reps: s.reps, carga: s.carga, rpe: s.rpe })) }));
+      smForcaExercicios = prefill.exercicios.map(e => ({
+        exercicioId: e.exercicioId,
+        unidade: (e.series[0] && e.series[0].unidade) || unidadeLembrada(e.exercicioId),
+        series: e.series.map(s => ({ reps: s.reps, carga: s.carga, rpe: s.rpe }))
+      }));
     } else if (smDiaPrescrito) {
-      smForcaExercicios = smDiaPrescrito.exercicios.map(e => ({ exercicioId: e.exercicioId, series: Array.from({ length: e.series }, () => ({ reps: '', carga: '', rpe: '' })) }));
+      smForcaExercicios = smDiaPrescrito.exercicios.map(e => ({
+        exercicioId: e.exercicioId,
+        unidade: unidadeLembrada(e.exercicioId),
+        series: Array.from({ length: e.series }, () => ({ reps: '', carga: '', rpe: '' }))
+      }));
     } else {
       smForcaExercicios = [];
     }
@@ -799,6 +884,8 @@ function renderForcaExercicios() {
   if (!container) return;
   container.innerHTML = smForcaExercicios.map((ex, idx) => {
     const hint = ex.exercicioId ? sugestaoProgressao(ex.exercicioId) : null;
+    const ultimaVez = ex.exercicioId ? formatUltimaVez(ex.exercicioId) : null;
+    const unidade = ex.unidade || 'kg';
     const seriesRows = ex.series.map((s, si) => (
       '<div class="serie-row" data-serie-idx="' + si + '">' +
       '<span>' + (si + 1) + '</span>' +
@@ -811,8 +898,13 @@ function renderForcaExercicios() {
     return '<div class="exercise-block" data-idx="' + idx + '">' +
       '<div class="exercise-block-top"><select class="ex-select" data-idx="' + idx + '">' + buildExercicioOptions(ex.exercicioId) + '</select>' +
       '<button type="button" class="btn-remove-serie" data-remove-ex="' + idx + '">✕</button></div>' +
+      (ultimaVez ? '<p class="ultima-vez-hint">\u{1F553} ' + ultimaVez + '</p>' : '') +
       (hint ? '<p class="progressao-hint">\u{1F4C8} ' + hint + '</p>' : '') +
-      '<div class="serie-row serie-row-head"><span>Nº</span><span>Reps</span><span>Carga</span><span>RPE</span><span></span></div>' +
+      '<div class="unidade-toggle">' +
+      '<button type="button" class="unidade-btn' + (unidade === 'kg' ? ' active' : '') + '" data-unidade-toggle="' + idx + '" data-val="kg">kg</button>' +
+      '<button type="button" class="unidade-btn' + (unidade === 'lb' ? ' active' : '') + '" data-unidade-toggle="' + idx + '" data-val="lb">lb</button>' +
+      '</div>' +
+      '<div class="serie-row serie-row-head"><span>Nº</span><span>Reps</span><span>Carga (' + unidade + ')</span><span>RPE</span><span></span></div>' +
       seriesRows +
       '<button type="button" class="btn-add-serie" data-add-serie="' + idx + '">+ Série</button>' +
       '</div>';
@@ -839,6 +931,26 @@ function handleSmBodyClick(e) {
   const addSerie = e.target.closest('[data-add-serie]');
   const remSerie = e.target.closest('[data-remove-serie]');
   const remEx = e.target.closest('[data-remove-ex]');
+  const unidadeToggle = e.target.closest('[data-unidade-toggle]');
+  if (unidadeToggle) {
+    syncForcaFromDOM();
+    const idx = parseInt(unidadeToggle.dataset.unidadeToggle);
+    const ex = smForcaExercicios[idx];
+    const novaUnidade = unidadeToggle.dataset.val;
+    const unidadeAntiga = ex.unidade || 'kg';
+    if (novaUnidade !== unidadeAntiga) {
+      ex.series.forEach(s => {
+        const valor = parseFloat(s.carga);
+        if (!isNaN(valor)) {
+          const emKg = unidadeAntiga === 'lb' ? lbToKg(valor) : valor;
+          s.carga = +(novaUnidade === 'lb' ? kgToLb(emKg) : emKg).toFixed(1);
+        }
+      });
+      ex.unidade = novaUnidade;
+    }
+    renderForcaExercicios();
+    return;
+  }
   if (addEx) {
     syncForcaFromDOM();
     smForcaExercicios.push({ exercicioId: '', series: [{ reps: '', carga: '', rpe: '' }] });
@@ -873,6 +985,7 @@ function handleSmBodyChange(e) {
   }
   syncForcaFromDOM();
   smForcaExercicios[idx].exercicioId = sel.value;
+  smForcaExercicios[idx].unidade = unidadeLembrada(sel.value);
   renderForcaExercicios();
 }
 
@@ -882,11 +995,12 @@ async function handleExercicioSave() {
   const grupo = document.getElementById('ex-grupo').value;
   const tipo = document.getElementById('ex-tipo').value;
   const id = 'custom-' + Date.now();
-  const data = { nome, grupo, tipo };
+  const data = { nome, grupo, tipo, classificacao: tipo === 'composto' ? 'Composto' : 'Isolado' };
   cachedExercicios[id] = { id, ...data };
   hideModal('exercicio-modal');
   if (pendingExerciseBlockIdx !== null) {
     smForcaExercicios[pendingExerciseBlockIdx].exercicioId = id;
+    smForcaExercicios[pendingExerciseBlockIdx].unidade = 'kg';
     renderForcaExercicios();
     pendingExerciseBlockIdx = null;
   }
@@ -894,11 +1008,14 @@ async function handleExercicioSave() {
 }
 
 function sugestaoProgressao(exercicioId) {
-  if (!planoForca) return null;
   let repsMax = null;
-  for (const dia of planoForca.sequencia) {
-    const found = dia.exercicios.find(e => e.exercicioId === exercicioId);
-    if (found) { repsMax = found.repsMax; break; }
+  for (const plano of [planoForca, planoEmagrecimento]) {
+    if (!plano) continue;
+    for (const dia of plano.sequencia) {
+      const found = dia.exercicios.find(e => e.exercicioId === exercicioId);
+      if (found) { repsMax = found.repsMax; break; }
+    }
+    if (repsMax) break;
   }
   if (!repsMax) return null;
   const historico = Object.values(cachedSessoes)
@@ -909,6 +1026,45 @@ function sugestaoProgressao(exercicioId) {
   if (historico.length < 2) return null;
   const bothHit = historico.every(h => h.series.length && h.series.every(s => parseFloat(s.reps) >= repsMax));
   return bothHit ? ('+2,5 kg sugerido (bateu ' + repsMax + ' reps nas últimas 2 sessões)') : null;
+}
+
+// ═══ Unidade de carga (kg/lb) e histórico "última vez" ═══
+const LB_PARA_KG = 0.453592;
+function kgToLb(kg) { return kg / LB_PARA_KG; }
+function lbToKg(lb) { return lb * LB_PARA_KG; }
+// Sessões salvas antes desta atualização não têm pesoKg — nesse caso `carga` já era sempre kg.
+function pesoEmKg(serie) { return serie.pesoKg != null ? serie.pesoKg : (serie.carga || 0); }
+
+function ultimoRegistroExercicio(exercicioId) {
+  const registros = Object.values(cachedSessoes)
+    .filter(s => s.tipo === 'forca' && s.exercicios)
+    .flatMap(s => s.exercicios.filter(e => e.exercicioId === exercicioId).map(e => ({ data: s.data, series: e.series })))
+    .filter(r => r.series && r.series.length)
+    .sort((a, b) => new Date(b.data) - new Date(a.data));
+  if (!registros.length) return null;
+  const ultimo = registros[0];
+  const melhorSerie = ultimo.series.reduce((best, s) => pesoEmKg(s) > pesoEmKg(best) ? s : best, ultimo.series[0]);
+  return { data: ultimo.data, serie: melhorSerie };
+}
+
+function unidadeLembrada(exercicioId) {
+  const reg = ultimoRegistroExercicio(exercicioId);
+  return reg && reg.serie.unidade ? reg.serie.unidade : 'kg';
+}
+
+function diasAtrasTexto(dataStr) {
+  const dias = -daysUntil(dataStr);
+  if (dias <= 0) return 'hoje';
+  if (dias === 1) return 'há 1 dia';
+  return 'há ' + dias + ' dias';
+}
+
+function formatUltimaVez(exercicioId) {
+  const reg = ultimoRegistroExercicio(exercicioId);
+  if (!reg) return null;
+  const unidade = reg.serie.unidade || 'kg';
+  const carga = reg.serie.carga != null ? reg.serie.carga : pesoEmKg(reg.serie);
+  return 'Última vez: ' + carga + unidade + ' × ' + reg.serie.reps + ' reps — ' + diasAtrasTexto(reg.data);
 }
 
 // ═══ Formulários cardio (corrida / natação / bike) e brick ═══
@@ -972,10 +1128,17 @@ function collectSessionForm(tipo) {
   const dataStr = fmtDate(new Date());
   if (tipo === 'forca') {
     syncForcaFromDOM();
-    const exercicios = smForcaExercicios.filter(e => e.exercicioId).map(e => ({
-      exercicioId: e.exercicioId,
-      series: e.series.filter(s => s.reps !== '' && s.reps !== undefined && s.reps !== null).map(s => ({ reps: parseFloat(s.reps) || 0, carga: parseFloat(s.carga) || 0, rpe: s.rpe ? parseFloat(s.rpe) : null }))
-    })).filter(e => e.series.length);
+    const exercicios = smForcaExercicios.filter(e => e.exercicioId).map(e => {
+      const unidade = e.unidade || 'kg';
+      return {
+        exercicioId: e.exercicioId,
+        series: e.series.filter(s => s.reps !== '' && s.reps !== undefined && s.reps !== null).map(s => {
+          const carga = parseFloat(s.carga) || 0;
+          const pesoKg = unidade === 'lb' ? +lbToKg(carga).toFixed(2) : carga;
+          return { reps: parseFloat(s.reps) || 0, carga, unidade, pesoKg, rpe: s.rpe ? parseFloat(s.rpe) : null };
+        })
+      };
+    }).filter(e => e.series.length);
     return { tipo, data: dataStr, exercicios, obs: document.getElementById('sm-forca-obs').value.trim(), planoDia: smDiaPrescrito ? smDiaPrescrito.nome : null };
   }
   if (tipo === 'brick') {
@@ -1026,7 +1189,12 @@ function validarSessao(sessao) {
 async function handleSessionSave() {
   const sessao = collectSessionForm(smTipo);
   const erro = validarSessao(sessao);
-  if (erro) { document.getElementById('sm-error').textContent = erro; return; }
+  if (erro) {
+    const errEl = document.getElementById('sm-error');
+    errEl.textContent = erro;
+    errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
   document.getElementById('sm-error').textContent = '';
   sessao.criadoEm = firebase.firestore.FieldValue.serverTimestamp();
   hideModal('session-modal');
@@ -1160,8 +1328,8 @@ function updateGamificacaoAfterSessao(sessao, isToday) {
       const info = cachedExercicios[ex.exercicioId];
       if (!info) return;
       gruposTocados.add(info.grupo);
-      const volume = ex.series.reduce((sum, s) => sum + (s.reps * s.carga), 0);
-      const maxCarga = Math.max(0, ...ex.series.map(s => s.carga));
+      const volume = ex.series.reduce((sum, s) => sum + (s.reps * pesoEmKg(s)), 0);
+      const maxCarga = Math.max(0, ...ex.series.map(pesoEmKg));
       const r = gamificacao.ranksMusculares[info.grupo] || { pontos: 0 };
       const pontosAntes = r.pontos || 0;
       r.pontos = pontosAntes + volume + maxCarga * 5;
@@ -1231,7 +1399,7 @@ function checkAchievements() {
   let novoRecorde = false;
   sessoesArr.filter(s => s.tipo === 'forca' && s.exercicios).sort((a, b) => new Date(a.data) - new Date(b.data)).forEach(s => {
     s.exercicios.forEach(ex => {
-      const maxSessao = Math.max(0, ...ex.series.map(x => x.carga));
+      const maxSessao = Math.max(0, ...ex.series.map(pesoEmKg));
       const atual = cargasPorExercicio[ex.exercicioId] || 0;
       if (maxSessao > atual) { if (atual > 0) novoRecorde = true; cargasPorExercicio[ex.exercicioId] = maxSessao; }
     });
@@ -1667,7 +1835,7 @@ function renderCargaChart() {
   if (!id) { destroyChart('chart-carga'); return; }
   const historico = Object.values(cachedSessoes)
     .filter(s => s.tipo === 'forca' && s.exercicios)
-    .map(s => { const ex = s.exercicios.find(e => e.exercicioId === id); if (!ex) return null; return { data: s.data, maxCarga: Math.max(0, ...ex.series.map(x => x.carga)) }; })
+    .map(s => { const ex = s.exercicios.find(e => e.exercicioId === id); if (!ex) return null; return { data: s.data, maxCarga: Math.max(0, ...ex.series.map(pesoEmKg)) }; })
     .filter(Boolean).sort((a, b) => new Date(a.data) - new Date(b.data));
   makeLineChart('chart-carga', historico.map(h => fmtShort(new Date(h.data + 'T00:00:00'))), [
     { label: 'Carga máxima (kg)', data: historico.map(h => h.maxCarga), borderColor: '#ffd700', tension: 0.3, fill: true, backgroundColor: 'rgba(255,215,0,0.1)' }
@@ -1683,6 +1851,7 @@ function renderMaisTab() {
   document.getElementById('cfg-peso').value = profile.peso || '';
   document.getElementById('cfg-altura').value = profile.altura || '';
   document.getElementById('plan-forca-info').textContent = planoForca ? ('\u{1F4AA} ' + planoForca.nome + ' — ' + planoForca.duracaoSemanas + ' semanas, dias: ' + planoForca.diasSemana.map(d => DAY_NAMES[d]).join('/')) : 'Nenhum plano de força carregado.';
+  document.getElementById('plan-emagrecimento-info').textContent = planoEmagrecimento ? ('\u{1F525} ' + planoEmagrecimento.nome + ' — ' + planoEmagrecimento.duracaoSemanas + ' semanas, dias: ' + planoEmagrecimento.diasSemana.map(d => DAY_NAMES[d]).join('/')) : '';
   document.getElementById('plan-ironman-info').textContent = planoIronman ? ('\u{1F3C6} ' + planoIronman.nome + ' — início em ' + fmtShort(new Date(planoIronman.inicio + 'T00:00:00'))) : '';
   if (profile.modoIronman) renderProvasManage();
 }
@@ -1708,7 +1877,7 @@ function exportSessoesCSV() {
     let metrica = '';
     if (s.pace) metrica = s.pace.display; else if (s.ritmo100) metrica = s.ritmo100.display; else if (s.velocidadeMedia) metrica = s.velocidadeMedia.toFixed(1) + ' km/h';
     let exDesc = '';
-    if (s.tipo === 'forca' && s.exercicios) exDesc = s.exercicios.map(e => (cachedExercicios[e.exercicioId] ? cachedExercicios[e.exercicioId].nome : e.exercicioId) + ':' + e.series.map(x => x.reps + 'x' + x.carga + 'kg').join('/')).join(' | ');
+    if (s.tipo === 'forca' && s.exercicios) exDesc = s.exercicios.map(e => (cachedExercicios[e.exercicioId] ? cachedExercicios[e.exercicioId].nome : e.exercicioId) + ':' + e.series.map(x => x.reps + 'x' + pesoEmKg(x) + 'kg').join('/')).join(' | ');
     rows.push([s.tipo, s.data, s.distancia || '', s.tempoMin || '', metrica, exDesc, (s.obs || '').replace(/\n/g, ' ')]);
   });
   const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
@@ -1716,7 +1885,7 @@ function exportSessoesCSV() {
 }
 
 function exportPlanos() {
-  const data = { forca: planoForca, ironman: planoIronman };
+  const data = { forca: planoForca, emagrecimento: planoEmagrecimento, ironman: planoIronman };
   downloadFile('ironfit-planos-' + fmtDate(new Date()) + '.json', JSON.stringify(data, null, 2), 'application/json');
 }
 
@@ -1742,6 +1911,14 @@ async function handleImportValidate() {
       planoForca = { id: 'forca-anatoly', ...rec };
       importou = true;
     }
+    if (data.emagrecimento || data.tipo === 'emagrecimento') {
+      const plano = data.emagrecimento || data;
+      if (!plano.nome || !plano.diasSemana || !plano.sequencia) throw new Error('Plano de emagrecimento precisa de nome, diasSemana e sequencia');
+      const rec = { tipo: 'emagrecimento', ...plano };
+      await db.collection('users').doc(currentUser.uid).collection('planos').doc('emagrecimento-bloco1').set(rec);
+      planoEmagrecimento = { id: 'emagrecimento-bloco1', ...rec };
+      importou = true;
+    }
     if (data.ironman || data.tipo === 'ironman') {
       const plano = data.ironman || data;
       if (!plano.nome || !plano.inicio || !plano.fases) throw new Error('Plano Ironman precisa de nome, inicio e fases');
@@ -1750,7 +1927,7 @@ async function handleImportValidate() {
       planoIronman = { id: 'ironman-2027', ...rec };
       importou = true;
     }
-    if (!importou) throw new Error('JSON precisa ter tipo "forca" ou "ironman" (ou chaves forca/ironman)');
+    if (!importou) throw new Error('JSON precisa ter tipo "forca", "emagrecimento" ou "ironman" (ou chaves forca/emagrecimento/ironman)');
     hideModal('import-modal');
     renderMaisTab();
   } catch (e) {

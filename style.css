@@ -346,6 +346,9 @@ select { width: 100%; padding: 14px 16px; border: 1px solid var(--border); borde
 
 /* ═══ Modal extras ═══ */
 .modal-scroll { max-height: 85vh; overflow-y: auto; }
+.modal.modal-scroll-fixed { display: flex; flex-direction: column; max-height: 85vh; padding-bottom: 0; }
+.modal-scroll-area { overflow-y: auto; flex: 1; min-height: 0; padding-bottom: 8px; }
+.modal-actions-fixed { flex-shrink: 0; margin-top: 0; padding-top: 14px; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--surface); }
 .sm-duplicate { margin-bottom: 16px; }
 .modal-sep { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
 .exercise-block { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 12px; }
@@ -358,6 +361,10 @@ select { width: 100%; padding: 14px 16px; border: 1px solid var(--border); borde
 .btn-remove-serie { background: none; border: none; color: var(--danger); font-size: 18px; cursor: pointer; -webkit-appearance: none; }
 .btn-add-exercicio { width: 100%; padding: 14px; min-height: 48px; border: 1px dashed var(--accent); border-radius: var(--radius-sm); background: none; color: var(--accent); font-size: 14px; font-weight: 700; cursor: pointer; -webkit-appearance: none; margin-bottom: 12px; }
 .progressao-hint { font-size: 12px; color: var(--success); font-weight: 700; margin-top: -4px; margin-bottom: 10px; }
+.ultima-vez-hint { font-size: 12px; color: var(--text-secondary); font-weight: 600; margin-top: -4px; margin-bottom: 10px; background: var(--surface-hover); display: inline-block; padding: 4px 10px; border-radius: 20px; }
+.unidade-toggle { display: flex; gap: 6px; margin-bottom: 10px; }
+.unidade-btn { flex: 1; min-height: 36px; padding: 6px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text-secondary); font-size: 13px; font-weight: 700; cursor: pointer; -webkit-appearance: none; }
+.unidade-btn.active { background: var(--forca-bg); border-color: var(--forca); color: var(--forca); }
 .mobilidade-list { font-size: 13px; color: var(--text-secondary); background: var(--forca-bg); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 16px; line-height: 1.7; }
 .import-textarea { width: 100%; min-height: 200px; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); font-size: 13px; font-family: monospace; resize: vertical; margin-bottom: 10px; }
 

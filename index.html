@@ -264,6 +264,7 @@
                 <h3 class="section-title">📅 Planos de Treino</h3>
                 <div class="more-card">
                     <p class="plan-info" id="plan-forca-info"></p>
+                    <p class="plan-info" id="plan-emagrecimento-info"></p>
                     <p class="plan-info" id="plan-ironman-info"></p>
                     <button id="btn-plan-export" class="btn-secondary">Exportar plano (JSON)</button>
                     <button id="btn-plan-import" class="btn-secondary">Importar plano (JSON)</button>
@@ -300,13 +301,15 @@
 
     <!-- Modal: Registrar sessão (genérico p/ força, corrida, natação, bike, brick) -->
     <div id="session-modal" class="modal-overlay hidden">
-        <div class="modal modal-scroll">
+        <div class="modal modal-scroll-fixed">
             <h3 class="modal-title" id="sm-title">Registrar Treino</h3>
-            <button id="sm-duplicate" class="btn-secondary sm-duplicate hidden">↻ Repetir treino anterior</button>
-            <div id="sm-body"></div>
-            <p id="sm-error" class="error-text"></p>
-            <div class="modal-actions">
-                <button id="sm-save" class="btn-primary">Salvar</button>
+            <div class="modal-scroll-area">
+                <button id="sm-duplicate" class="btn-secondary sm-duplicate hidden">↻ Repetir treino anterior</button>
+                <div id="sm-body"></div>
+                <p id="sm-error" class="error-text"></p>
+            </div>
+            <div class="modal-actions modal-actions-fixed">
+                <button id="sm-save" class="btn-primary">Concluir treino</button>
                 <button id="sm-cancel" class="btn-secondary">Cancelar</button>
             </div>
         </div>
