@@ -293,11 +293,18 @@ async function boot() {
     return;
   }
   profile = profSnap.data();
+  aplicarTema(profile.tema || 'dark');
   document.getElementById('profile-screen').classList.add('hidden');
   await loadAllData();
   document.getElementById('app').classList.remove('hidden');
   applyModeVisibility();
   switchTab('hoje');
+}
+
+function aplicarTema(tema) {
+  document.documentElement.dataset.theme = tema;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', tema === 'light' ? '#f1f1f6' : '#0a0a1a');
 }
 
 async function loadAllData() {
@@ -452,7 +459,24 @@ function setupEvents() {
     document.querySelectorAll('#cfg-objetivo .option-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
   });
+  document.getElementById('cfg-tema').addEventListener('click', async e => {
+    const btn = e.target.closest('.option-btn');
+    if (!btn) return;
+    document.querySelectorAll('#cfg-tema .option-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    const tema = btn.dataset.val;
+    aplicarTema(tema);
+    profile.tema = tema;
+    await db.collection('users').doc(currentUser.uid).collection('profile').doc('data').set({ tema }, { merge: true });
+  });
   document.getElementById('cfg-save').addEventListener('click', handleProfileUpdate);
+  document.getElementById('cfg-conquistas').addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (chip) toggleConquistaAtiva(chip.dataset.id);
+  });
+  document.getElementById('btn-reset-forca').addEventListener('click', () => resetPlano('forca'));
+  document.getElementById('btn-reset-emagrecimento').addEventListener('click', () => resetPlano('emagrecimento'));
+  document.getElementById('btn-reset-ironman').addEventListener('click', () => resetPlano('ironman'));
   document.getElementById('btn-plan-export').addEventListener('click', exportPlanos);
   document.getElementById('btn-plan-import').addEventListener('click', () => showImportModal('plano'));
   document.getElementById('btn-export-json').addEventListener('click', exportAllJSON);
@@ -1378,11 +1402,25 @@ function getTierRankDisciplina(disciplina, km) {
   return RANK_TIERS[idx];
 }
 
+// Cada perfil acompanha só as conquistas relevantes pro seu objetivo por padrão
+// (ex: quem não corre não vê metas de corrida), mas pode customizar em Mais → Minhas Conquistas.
+function defaultConquistasParaObjetivo() {
+  if (profile.modoIronman) return ACHIEVEMENTS_DEFS.map(a => a.id);
+  const universais = ['dez-treinos-mes', 'recorde-carga', 'streak-30'];
+  if (profile.objetivo === 'corrida') return universais.concat(['primeira-corrida-5k', 'dois-digitos', 'meia-maratona', 'pace-sub-8']);
+  return universais;
+}
+function getConquistasAtivas() {
+  return Array.isArray(profile.conquistasAtivas) ? profile.conquistasAtivas : defaultConquistasParaObjetivo();
+}
+function isConquistaAtiva(id) { return getConquistasAtivas().includes(id); }
+
 function checkAchievements() {
   gamificacao.conquistas = gamificacao.conquistas || {};
   const novas = [];
   const sessoesArr = Object.values(cachedSessoes);
   const unlock = (id) => {
+    if (!isConquistaAtiva(id)) return;
     if (gamificacao.conquistas[id]) return;
     gamificacao.conquistas[id] = { desbloqueadaEm: new Date().toISOString() };
     const def = ACHIEVEMENTS_DEFS.find(a => a.id === id);
@@ -1418,12 +1456,27 @@ async function saveGamificacao() {
 // restante. Chamado sempre que uma sessão é apagada, para que ranks/streak/XP não fiquem
 // "presos" num valor que não reflete mais os dados reais. Conquistas nunca são revogadas —
 // uma vez desbloqueadas, permanecem (como na maioria dos apps de gamificação).
+// Recalcula XP, streak, ranks e conquistas do zero a partir do histórico atual de sessões e
+// provas. Diferente de um "sticky ledger", isso é recomputado sempre que dados são apagados
+// ou editados — se a única sessão que garantia uma conquista some, a conquista some junto,
+// igual já acontecia com ranks/XP/streak. Retorna as conquistas recém-desbloqueadas (se
+// alguma reaparecer/aparecer pela primeira vez), para quem chamou decidir se celebra ou não.
 function recomputarGamificacao() {
-  const conquistasExistentes = gamificacao.conquistas || {};
+  const conquistasAntes = new Set(Object.keys(gamificacao.conquistas || {}));
   gamificacao = defaultGamificacao();
-  gamificacao.conquistas = conquistasExistentes;
   const sessoesOrdenadas = Object.values(cachedSessoes).slice().sort((a, b) => new Date(a.data) - new Date(b.data));
   sessoesOrdenadas.forEach(s => updateGamificacaoAfterSessao(s, true));
+  // Conquistas ligadas a provas (ex: 70.3, Full Ironman) não passam pelo checkAchievements
+  // (que só olha sessões) — rederiva a partir do estado atual das provas.
+  Object.values(cachedProvas).forEach(r => {
+    if (r.resultado && r.achievementId && isConquistaAtiva(r.achievementId) && !gamificacao.conquistas[r.achievementId]) {
+      gamificacao.conquistas[r.achievementId] = { desbloqueadaEm: new Date().toISOString() };
+    }
+  });
+  return Object.keys(gamificacao.conquistas)
+    .filter(id => !conquistasAntes.has(id))
+    .map(id => ACHIEVEMENTS_DEFS.find(a => a.id === id))
+    .filter(Boolean);
 }
 
 // ╔══════════════════════════════════════════════════════════════╗
@@ -1681,7 +1734,9 @@ function renderRanksDisciplinas() {
 
 function renderAchievements() {
   const container = document.getElementById('achievements-list');
-  container.innerHTML = ACHIEVEMENTS_DEFS.map(a => {
+  const ativas = new Set(getConquistasAtivas());
+  const lista = ACHIEVEMENTS_DEFS.filter(a => ativas.has(a.id));
+  container.innerHTML = lista.map(a => {
     const data = (gamificacao.conquistas || {})[a.id];
     const done = !!data;
     return '<div class="achieve-card ' + (done ? 'completed' : 'available') + '">' +
@@ -1689,7 +1744,7 @@ function renderAchievements() {
       '<div class="achieve-info"><h4>' + a.nome + '</h4><p class="achieve-desc">' + a.desc + '</p>' +
       (done && data.desbloqueadaEm ? '<span class="achieve-date">' + fmtShort(new Date(data.desbloqueadaEm)) + '</span>' : '') +
       '</div></div>';
-  }).join('');
+  }).join('') || '<p class="empty-state">Nenhuma conquista selecionada. Escolha em Mais → Minhas Conquistas.</p>';
 }
 
 function buildProvaCardHTML(id, r) {
@@ -1758,17 +1813,14 @@ async function handleProvaSave() {
   const id = editingProvaId || db.collection('users').doc(currentUser.uid).collection('provas').doc().id;
   cachedProvas[id] = rec;
   hideModal('prova-modal');
-  if (temResultado && rec.achievementId && !(gamificacao.conquistas || {})[rec.achievementId]) {
-    gamificacao.conquistas = gamificacao.conquistas || {};
-    gamificacao.conquistas[rec.achievementId] = { desbloqueadaEm: new Date().toISOString() };
-    const def = ACHIEVEMENTS_DEFS.find(a => a.id === rec.achievementId);
-    if (def) celebrate(def.icon, def.nome, 'Conquista desbloqueada!');
-    await saveGamificacao();
-  }
+  const novasConquistas = recomputarGamificacao();
+  novasConquistas.forEach(a => celebrate(a.icon, a.nome, 'Conquista desbloqueada!'));
   renderRacesScreen();
   renderProvasManage();
   renderNextCards();
+  if (currentTab === 'evolucao') renderEvolucaoTab();
   await db.collection('users').doc(currentUser.uid).collection('provas').doc(id).set(rec);
+  await saveGamificacao();
 }
 
 async function handleProvaDelete() {
@@ -1777,10 +1829,13 @@ async function handleProvaDelete() {
   const id = editingProvaId;
   delete cachedProvas[id];
   hideModal('prova-modal');
+  recomputarGamificacao();
   renderRacesScreen();
   renderProvasManage();
   renderNextCards();
+  if (currentTab === 'evolucao') renderEvolucaoTab();
   await db.collection('users').doc(currentUser.uid).collection('provas').doc(id).delete();
+  await saveGamificacao();
 }
 
 function renderEvolucaoCharts() {
@@ -1865,12 +1920,56 @@ function renderCargaChart() {
 function renderMaisTab() {
   document.getElementById('cfg-nome').value = profile.nome || '';
   document.querySelectorAll('#cfg-objetivo .option-btn').forEach(b => b.classList.toggle('selected', b.dataset.val === profile.objetivo));
+  document.querySelectorAll('#cfg-tema .option-btn').forEach(b => b.classList.toggle('selected', b.dataset.val === (profile.tema || 'dark')));
   document.getElementById('cfg-peso').value = profile.peso || '';
   document.getElementById('cfg-altura').value = profile.altura || '';
   document.getElementById('plan-forca-info').textContent = planoForca ? ('\u{1F4AA} ' + planoForca.nome + ' — ' + planoForca.duracaoSemanas + ' semanas, dias: ' + planoForca.diasSemana.map(d => DAY_NAMES[d]).join('/')) : 'Nenhum plano de força carregado.';
+  document.getElementById('plan-emagrecimento-row').classList.toggle('hidden', !planoEmagrecimento);
   document.getElementById('plan-emagrecimento-info').textContent = planoEmagrecimento ? ('\u{1F525} ' + planoEmagrecimento.nome + ' — ' + planoEmagrecimento.duracaoSemanas + ' semanas, dias: ' + planoEmagrecimento.diasSemana.map(d => DAY_NAMES[d]).join('/')) : '';
+  document.getElementById('plan-ironman-row').classList.toggle('hidden', !profile.modoIronman);
   document.getElementById('plan-ironman-info').textContent = planoIronman ? ('\u{1F3C6} ' + planoIronman.nome + ' — início em ' + fmtShort(new Date(planoIronman.inicio + 'T00:00:00'))) : '';
   if (profile.modoIronman) renderProvasManage();
+  renderCfgConquistas();
+}
+
+function renderCfgConquistas() {
+  const ativas = new Set(getConquistasAtivas());
+  document.getElementById('cfg-conquistas').innerHTML = ACHIEVEMENTS_DEFS.map(a =>
+    '<button type="button" class="chip' + (ativas.has(a.id) ? ' active' : '') + '" data-id="' + a.id + '">' + a.icon + ' ' + a.nome + '</button>'
+  ).join('');
+}
+
+async function toggleConquistaAtiva(id) {
+  const ativas = new Set(getConquistasAtivas());
+  const ligando = !ativas.has(id);
+  if (ligando) ativas.add(id); else ativas.delete(id);
+  profile.conquistasAtivas = Array.from(ativas);
+  renderCfgConquistas();
+  await db.collection('users').doc(currentUser.uid).collection('profile').doc('data').set({ conquistasAtivas: profile.conquistasAtivas }, { merge: true });
+  if (ligando) {
+    const novas = checkAchievements();
+    if (novas.length) {
+      await saveGamificacao();
+      novas.forEach(a => celebrate(a.icon, a.nome, 'Conquista desbloqueada!'));
+      if (currentTab === 'evolucao') renderEvolucaoTab();
+    }
+  }
+}
+
+async function resetPlano(tipo) {
+  const config = {
+    forca: { docId: 'forca-anatoly', seed: PLANO_FORCA_ANATOLY, varName: 'planoForca' },
+    emagrecimento: { docId: 'emagrecimento-bloco1', seed: PLANO_EMAGRECIMENTO_SEED, varName: 'planoEmagrecimento' },
+    ironman: { docId: 'ironman-2027', seed: PLANO_IRONMAN_SEED, varName: 'planoIronman' }
+  }[tipo];
+  if (!confirm('Restaurar este plano para o padrão? Qualquer edição ou importação feita nele será perdida.')) return;
+  const rec = { tipo, ...config.seed };
+  await db.collection('users').doc(currentUser.uid).collection('planos').doc(config.docId).set(rec);
+  const valor = { id: config.docId, ...rec };
+  if (tipo === 'forca') planoForca = valor;
+  else if (tipo === 'emagrecimento') planoEmagrecimento = valor;
+  else if (tipo === 'ironman') planoIronman = valor;
+  renderMaisTab();
 }
 
 // ═══ Exportação / Importação ═══
@@ -1902,7 +2001,10 @@ function exportSessoesCSV() {
 }
 
 function exportPlanos() {
-  const data = { forca: planoForca, emagrecimento: planoEmagrecimento, ironman: planoIronman };
+  // Inclui a biblioteca de exercícios (com os IDs usados em exercicioId) junto dos planos,
+  // para servir de referência ao escrever/editar um plano JSON sem inventar IDs inexistentes.
+  const exerciciosLista = Object.values(cachedExercicios).map(e => ({ id: e.id, nome: e.nome, grupo: e.grupo, classificacao: e.classificacao || (e.tipo === 'isolado' ? 'Isolado' : 'Composto') }));
+  const data = { forca: planoForca, emagrecimento: planoEmagrecimento, ironman: planoIronman, exercicios: exerciciosLista };
   downloadFile('ironfit-planos-' + fmtDate(new Date()) + '.json', JSON.stringify(data, null, 2), 'application/json');
 }
 
@@ -1911,6 +2013,39 @@ function showImportModal() {
   document.getElementById('import-textarea').value = '';
   document.getElementById('import-error').textContent = '';
   document.getElementById('import-modal').classList.remove('hidden');
+}
+
+// Registra no Firestore + no cache local qualquer exercício novo que o plano declare
+// explicitamente em `exerciciosNovos`, para que a sequência do plano já apareça completa
+// sem precisar cadastrar cada exercício manualmente depois de importar.
+async function provisionarExerciciosNovos(plano) {
+  if (!Array.isArray(plano.exerciciosNovos)) return;
+  for (const ex of plano.exerciciosNovos) {
+    if (!ex.id || !ex.nome || cachedExercicios[ex.id]) continue;
+    const data = {
+      nome: ex.nome,
+      grupo: ex.grupo || 'core',
+      tipo: ex.classificacao === 'Isolado' ? 'isolado' : 'composto',
+      classificacao: ex.classificacao === 'Isolado' ? 'Isolado' : 'Composto'
+    };
+    cachedExercicios[ex.id] = { id: ex.id, ...data };
+    await db.collection('users').doc(currentUser.uid).collection('exercicios').doc(ex.id).set(data);
+  }
+}
+
+// Confere que cada dia da sequência tem exercícios e que todo exercicioId referenciado
+// existe na biblioteca (depois de provisionarExerciciosNovos rodar) — em vez de salvar
+// silenciosamente um plano "quebrado" sem exercícios visíveis no checklist.
+function validarSequenciaPlano(plano) {
+  if (!plano.sequencia || !plano.sequencia.length) throw new Error('Plano precisa de ao menos 1 dia em "sequencia".');
+  const idsFaltando = new Set();
+  plano.sequencia.forEach((dia, i) => {
+    if (!dia.exercicios || !dia.exercicios.length) throw new Error('O dia "' + (dia.nome || i + 1) + '" está sem exercícios em "exercicios".');
+    dia.exercicios.forEach(e => { if (!cachedExercicios[e.exercicioId]) idsFaltando.add(e.exercicioId); });
+  });
+  if (idsFaltando.size) {
+    throw new Error('Exercício(s) desconhecido(s): ' + Array.from(idsFaltando).join(', ') + '. Declare-os em "exerciciosNovos" no JSON (com nome/grupo/classificacao) ou use um ID já existente — veja "Exportar planos + exercícios".');
+  }
 }
 
 async function handleImportValidate() {
@@ -1922,16 +2057,22 @@ async function handleImportValidate() {
     let importou = false;
     if (data.forca || data.tipo === 'forca') {
       const plano = data.forca || data;
-      if (!plano.nome || !plano.diasSemana || !plano.sequencia) throw new Error('Plano de força precisa de nome, diasSemana e sequencia');
+      if (!plano.nome || !plano.diasSemana) throw new Error('Plano de força precisa de nome e diasSemana');
+      await provisionarExerciciosNovos(plano);
+      validarSequenciaPlano(plano);
       const rec = { tipo: 'forca', ...plano };
+      delete rec.exerciciosNovos;
       await db.collection('users').doc(currentUser.uid).collection('planos').doc('forca-anatoly').set(rec);
       planoForca = { id: 'forca-anatoly', ...rec };
       importou = true;
     }
     if (data.emagrecimento || data.tipo === 'emagrecimento') {
       const plano = data.emagrecimento || data;
-      if (!plano.nome || !plano.diasSemana || !plano.sequencia) throw new Error('Plano de emagrecimento precisa de nome, diasSemana e sequencia');
+      if (!plano.nome || !plano.diasSemana) throw new Error('Plano de emagrecimento precisa de nome e diasSemana');
+      await provisionarExerciciosNovos(plano);
+      validarSequenciaPlano(plano);
       const rec = { tipo: 'emagrecimento', ...plano };
+      delete rec.exerciciosNovos;
       await db.collection('users').doc(currentUser.uid).collection('planos').doc('emagrecimento-bloco1').set(rec);
       planoEmagrecimento = { id: 'emagrecimento-bloco1', ...rec };
       importou = true;

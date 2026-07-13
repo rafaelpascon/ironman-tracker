@@ -255,6 +255,13 @@
                         <div class="modal-field"><label>Peso (kg)</label><input type="number" id="cfg-peso" inputmode="decimal" step="any"></div>
                         <div class="modal-field"><label>Altura (cm)</label><input type="number" id="cfg-altura" inputmode="numeric"></div>
                     </div>
+                    <div class="modal-field">
+                        <label>Tema</label>
+                        <div class="option-grid" id="cfg-tema">
+                            <button type="button" class="option-btn" data-val="dark">🌙 Escuro</button>
+                            <button type="button" class="option-btn" data-val="light">☀️ Claro</button>
+                        </div>
+                    </div>
                     <button id="cfg-save" class="btn-primary">Salvar perfil</button>
                     <p id="cfg-saved-msg" class="saved-msg hidden">Salvo ✓</p>
                 </div>
@@ -263,10 +270,19 @@
             <section class="section">
                 <h3 class="section-title">📅 Planos de Treino</h3>
                 <div class="more-card">
-                    <p class="plan-info" id="plan-forca-info"></p>
-                    <p class="plan-info" id="plan-emagrecimento-info"></p>
-                    <p class="plan-info" id="plan-ironman-info"></p>
-                    <button id="btn-plan-export" class="btn-secondary">Exportar plano (JSON)</button>
+                    <div class="plan-row">
+                        <p class="plan-info" id="plan-forca-info"></p>
+                        <button id="btn-reset-forca" class="btn-chip">Restaurar padrão</button>
+                    </div>
+                    <div class="plan-row hidden" id="plan-emagrecimento-row">
+                        <p class="plan-info" id="plan-emagrecimento-info"></p>
+                        <button id="btn-reset-emagrecimento" class="btn-chip">Restaurar padrão</button>
+                    </div>
+                    <div class="plan-row hidden" id="plan-ironman-row">
+                        <p class="plan-info" id="plan-ironman-info"></p>
+                        <button id="btn-reset-ironman" class="btn-chip">Restaurar padrão</button>
+                    </div>
+                    <button id="btn-plan-export" class="btn-secondary">Exportar planos + exercícios (JSON)</button>
                     <button id="btn-plan-import" class="btn-secondary">Importar plano (JSON)</button>
                 </div>
             </section>
@@ -274,6 +290,14 @@
             <section id="provas-manage-section" class="section hidden">
                 <div class="section-header-row"><h3 class="section-title">🏁 Gerenciar Provas</h3><button id="btn-add-prova" class="btn-chip">+ Prova</button></div>
                 <div id="provas-manage-list"></div>
+            </section>
+
+            <section class="section">
+                <h3 class="section-title">🏆 Minhas Conquistas</h3>
+                <div class="more-card">
+                    <p class="plan-info">Escolha quais conquistas você quer acompanhar na aba Evolução.</p>
+                    <div class="chip-row" id="cfg-conquistas"></div>
+                </div>
             </section>
 
             <section class="section">
@@ -409,6 +433,7 @@
     <div id="import-modal" class="modal-overlay hidden">
         <div class="modal modal-scroll">
             <h3 class="modal-title" id="import-modal-title">Importar JSON</h3>
+            <p class="plan-info">Exercício novo? Declare em <code>exerciciosNovos: [{"id","nome","grupo","classificacao"}]</code> no JSON para ele ser criado automaticamente.</p>
             <textarea id="import-textarea" class="import-textarea" placeholder="Cole o JSON aqui..."></textarea>
             <p id="import-error" class="error-text"></p>
             <div class="modal-actions">

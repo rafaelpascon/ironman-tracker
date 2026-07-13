@@ -45,6 +45,18 @@
   --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
+/* ═══ Modo claro ═══ */
+:root[data-theme="light"] {
+  --bg: #f1f1f6;
+  --surface: #ffffff;
+  --surface-hover: #eaeaf3;
+  --border: #dcdce6;
+  --text: #17172a;
+  --text-secondary: #55556e;
+  --text-muted: #8b8ba3;
+  --shadow: 0 4px 24px rgba(30, 30, 60, 0.08);
+}
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; height: -webkit-fill-available; }
 
@@ -412,6 +424,9 @@ select { width: 100%; padding: 14px 16px; border: 1px solid var(--border); borde
 .more-card .btn-secondary, .more-card .btn-primary { margin-top: 0; }
 .saved-msg { color: var(--success); font-size: 13px; font-weight: 700; text-align: center; }
 .plan-info { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+.plan-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.plan-row .plan-info { flex: 1; }
+.plan-row .btn-chip { flex-shrink: 0; white-space: nowrap; }
 
 /* ═══ Responsive: wider viewports (tablet/desktop preview) ═══ */
 .pulse { animation: checkPop 0.5s ease; }
