@@ -20,20 +20,25 @@ const GRUPOS_MUSCULARES = [
   { id: 'core', nome: 'Core', icon: '\u{1F525}' }
 ];
 
+// Faixas de XP acumulado (por grupo muscular ou por disciplina Ironman) — [AJUSTAR]
+// depois de observar uso real por algumas semanas. Com o teto diário de 150 XP/grupo,
+// a progressão esperada em treino consistente (3x/semana) é ~1 semana até Prata,
+// ~1 mês até Ouro, ~2-3 meses até Platina, ~5-6 meses até Diamante, ~1 ano+ até Lenda.
 const RANK_TIERS = [
   { id: 'bronze', nome: 'Bronze', min: 0, color: 'var(--bronze)' },
-  { id: 'prata', nome: 'Prata', min: 400, color: 'var(--prata)' },
-  { id: 'ouro', nome: 'Ouro', min: 1200, color: 'var(--ouro)' },
-  { id: 'platina', nome: 'Platina', min: 3000, color: 'var(--platina)' },
-  { id: 'diamante', nome: 'Diamante', min: 6000, color: 'var(--diamante)' },
-  { id: 'lenda', nome: 'Lenda', min: 12000, color: 'var(--lenda)' }
+  { id: 'prata', nome: 'Prata', min: 500, color: 'var(--prata)' },
+  { id: 'ouro', nome: 'Ouro', min: 1500, color: 'var(--ouro)' },
+  { id: 'platina', nome: 'Platina', min: 4000, color: 'var(--platina)' },
+  { id: 'diamante', nome: 'Diamante', min: 9000, color: 'var(--diamante)' },
+  { id: 'lenda', nome: 'Lenda', min: 20000, color: 'var(--lenda)' }
 ];
 
-const DISCIPLINE_RANK_KM = {
-  natacao: [0, 5, 15, 40, 80, 150],
-  bike: [0, 50, 150, 400, 800, 1500],
-  corrida: [0, 20, 60, 150, 300, 600]
-};
+// Teto diário de XP por grupo muscular/disciplina — evita que um treino pesado isolado
+// pule várias faixas de rank de uma vez.
+const XP_MAX_DIARIO_POR_GRUPO = 150;
+// Conversão de distância em XP por disciplina no modo Ironman (substituindo os limiares
+// fixos por km de antes) — números de partida, também [AJUSTAR] com uso real.
+const XP_POR_KM_DISCIPLINA = { corrida: 20, natacao: 40, bike: 2 };
 
 // ═══ Biblioteca de exercícios padrão ═══
 const EXERCICIOS_DEFAULT = [
@@ -68,7 +73,9 @@ const EXERCICIOS_DEFAULT = [
   { id: 'iso-lateral-shoulder-press', nome: 'Iso lateral shoulder press', grupo: 'ombros', tipo: 'composto', classificacao: 'Composto' },
   { id: 'leg-press-45', nome: 'Leg press 45°', grupo: 'pernas', tipo: 'composto', classificacao: 'Composto' },
   { id: 'cadeira-extensora', nome: 'Cadeira extensora', grupo: 'pernas', tipo: 'isolado', classificacao: 'Isolado' },
-  { id: 'cadeira-flexora', nome: 'Cadeira flexora', grupo: 'pernas', tipo: 'isolado', classificacao: 'Isolado' }
+  { id: 'cadeira-flexora', nome: 'Cadeira flexora', grupo: 'pernas', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'rosca-direta-halter', nome: 'Rosca direta halter', grupo: 'bracos', tipo: 'isolado', classificacao: 'Isolado' },
+  { id: 'agachamento-hack', nome: 'Agachamento hack', grupo: 'pernas', tipo: 'composto', classificacao: 'Composto' }
 ];
 
 // ═══ Plano de Força — estilo Anatoly (todos os usuários) ═══
@@ -230,7 +237,19 @@ const ACHIEVEMENTS_DEFS = [
   { id: 'dois-digitos', nome: 'Dois Dígitos', desc: 'Completar uma corrida de 10 km', icon: '\u{1F51F}' },
   { id: 'meia-maratona', nome: 'Meia Maratona', desc: 'Completar 21 km correndo', icon: '\u{1F396}\u{FE0F}' },
   { id: 'setenta-e-tres', nome: '70.3', desc: 'Cruzar a linha de chegada do Ironman 70.3', icon: '\u{1F947}' },
-  { id: 'iron-man', nome: 'Iron Man', desc: 'Cruzar a linha de chegada do Full Ironman', icon: '\u{1F3C6}' }
+  { id: 'iron-man', nome: 'Iron Man', desc: 'Cruzar a linha de chegada do Full Ironman', icon: '\u{1F3C6}' },
+  { id: 'perda-peso-5', nome: 'Primeiro Passo', desc: '5% de peso perdido desde o início', icon: '\u{1F343}' },
+  { id: 'perda-peso-10', nome: 'Metade do Caminho', desc: '10% de peso perdido desde o início', icon: '\u{1F6E4}\u{FE0F}' },
+  { id: 'perda-peso-15', nome: 'Transformação', desc: '15% de peso perdido desde o início', icon: '\u{1F98B}' },
+  { id: 'ganho-muscular-2', nome: 'Ganho Inicial', desc: '+2 pontos percentuais de massa muscular na composição corporal', icon: '\u{1F4AA}' },
+  { id: 'ganho-muscular-5', nome: 'Evolução Visível', desc: '+5 pontos percentuais de massa muscular na composição corporal', icon: '\u{1F3CB}\u{FE0F}' },
+  { id: 'ganho-muscular-10', nome: 'Transformação Muscular', desc: '+10 pontos percentuais de massa muscular na composição corporal', icon: '\u{1F9BE}' },
+  { id: 'leg-press-200', nome: 'Primeiro Empurrão', desc: '200 kg no Leg Press 45°', icon: '\u{1F9BF}' },
+  { id: 'leg-press-250', nome: 'Potência de Perna', desc: '250 kg no Leg Press 45°', icon: '\u{1F9BE}' },
+  { id: 'leg-press-300', nome: 'Perna de Aço', desc: '300 kg no Leg Press 45°', icon: '\u{2699}\u{FE0F}' },
+  { id: 'rosca-halter-12', nome: 'Braço Firme', desc: '12 kg por halter na rosca direta', icon: '\u{1F4AA}' },
+  { id: 'rosca-halter-16', nome: 'Bíceps em Progresso', desc: '16 kg por halter na rosca direta', icon: '\u{1F4AA}' },
+  { id: 'rosca-halter-20', nome: 'Braço de Ferro', desc: '20 kg por halter na rosca direta', icon: '\u{1F3C6}' }
 ];
 
 const DAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -395,6 +414,12 @@ function setupEvents() {
 
   // Treinos tab
   document.getElementById('fab-treino').addEventListener('click', () => showTipoModal());
+  document.getElementById('btn-ver-semana').addEventListener('click', () => {
+    renderSemanaCompletaModal();
+    document.getElementById('semana-modal').classList.remove('hidden');
+  });
+  document.getElementById('semana-fechar').addEventListener('click', () => hideModal('semana-modal'));
+  document.getElementById('rpe-info-fechar').addEventListener('click', () => hideModal('rpe-info-modal'));
   document.getElementById('treinos-filtro').addEventListener('click', e => {
     const chip = e.target.closest('.chip');
     if (!chip) return;
@@ -751,18 +776,92 @@ function renderWeek() {
   const today = new Date();
   const monday = getMonday(today);
   let html = '';
+  let prescritosNaSemana = 0, feitosNaSemana = 0;
   for (let i = 0; i < 7; i++) {
     const d = new Date(monday); d.setDate(d.getDate() + i);
     const dateStr = fmtDate(d);
     const isToday = dateStr === fmtDate(today);
     const prescrito = isDiaPrescrito(d);
     const done = Object.values(cachedSessoes).some(s => s.data === dateStr);
+    if (prescrito) { prescritosNaSemana++; if (done) feitosNaSemana++; }
     const cls = ['day-card', prescrito ? 'active-day' : 'rest'];
     if (isToday) cls.push('is-today');
     if (done) cls.push('completed');
     html += '<div class="' + cls.join(' ') + '"><span class="day-label">' + DAY_NAMES[d.getDay()] + '</span><span class="day-number">' + d.getDate() + '</span><span class="day-status">' + (done ? '✓' : (prescrito ? '○' : '—')) + '</span></div>';
   }
   document.getElementById('week-days').innerHTML = html;
+  // Contador específico da SEMANA atual (seg-dom) — separado do resumo mensal logo abaixo,
+  // que soma dias de várias semanas e por isso naturalmente mostra um número maior.
+  document.getElementById('week-count-text').textContent = feitosNaSemana + '/' + prescritosNaSemana + ' treinos';
+}
+
+// ═══ Ver semana completa (somente leitura) ═══
+// Reconstrói o que cada dia da semana civil atual mostraria/mostrou no "Hoje": dias já
+// passados/logados usam o nome real da sessão salva; dias futuros projetam a partir da
+// posição atual de rotação (proximoIndiceForca), sem mutar o estado real.
+function computeSemanaPreview() {
+  const hoje = new Date();
+  const monday = getMonday(hoje);
+  const dias = [];
+  let indiceProjetado = gamificacao.proximoIndiceForca || 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday); d.setDate(d.getDate() + i);
+    const weekday = d.getDay();
+    const dateStr = fmtDate(d);
+    const isHoje = dateStr === fmtDate(hoje);
+    const blocos = [];
+    const sessaoForcaDoDia = Object.values(cachedSessoes).find(s => s.tipo === 'forca' && s.data === dateStr);
+
+    if (profile.modoIronman && planoIronman) {
+      const fase = getFaseParaData(d);
+      const sched = fase.schedule[weekday];
+      blocos.push({ tipo: sched.tipo, nome: sched.nome, icon: sched.icon, duracao: sched.duracao, exercicios: null, feito: null });
+      if (fase.forcaDias && fase.forcaDias.includes(weekday) && planoForca && planoForca.sequencia.length) {
+        if (sessaoForcaDoDia) {
+          blocos.push({ tipo: 'forca', nome: sessaoForcaDoDia.planoDia || 'Força', icon: '\u{1F4AA}', exercicios: null, feito: true });
+        } else {
+          const dia = planoForca.sequencia[indiceProjetado % planoForca.sequencia.length];
+          blocos.push({ tipo: 'forca', nome: dia.nome, icon: '\u{1F4AA}', exercicios: dia.exercicios, feito: false });
+          indiceProjetado++;
+        }
+      }
+    } else {
+      const plano = getPlanoResistenciaAtivo();
+      if (plano && plano.diasSemana.includes(weekday)) {
+        const icon = profile.objetivo === 'emagrecimento' ? '\u{1F525}' : '\u{1F4AA}';
+        if (sessaoForcaDoDia) {
+          blocos.push({ tipo: 'forca', nome: sessaoForcaDoDia.planoDia || 'Força', icon, exercicios: null, feito: true });
+        } else if (plano.sequencia.length) {
+          const dia = plano.sequencia[indiceProjetado % plano.sequencia.length];
+          blocos.push({ tipo: 'forca', nome: dia.nome, icon, exercicios: dia.exercicios, feito: false });
+          indiceProjetado++;
+        }
+      } else {
+        blocos.push({ tipo: 'rest', nome: 'Descanso', icon: '\u{1F634}', exercicios: null, feito: null });
+      }
+    }
+    dias.push({ data: d, weekday, isHoje, blocos });
+  }
+  return dias;
+}
+
+function renderSemanaCompletaModal() {
+  const dias = computeSemanaPreview();
+  document.getElementById('semana-completa-list').innerHTML = dias.map(dia => {
+    const dataLabel = DAY_NAMES[dia.weekday] + ', ' + dia.data.getDate() + ' ' + MONTH_NAMES[dia.data.getMonth()].slice(0, 3);
+    const blocosHtml = dia.blocos.map(b => {
+      let exList = '';
+      if (b.exercicios && b.exercicios.length) {
+        exList = '<ul class="semana-exercicios">' + b.exercicios.map(e => {
+          const info = cachedExercicios[e.exercicioId];
+          return '<li>' + (info ? info.nome : e.exercicioId) + ' — ' + e.series + 'x' + e.repsMin + (e.repsMax !== e.repsMin ? '-' + e.repsMax : '') + '</li>';
+        }).join('') + '</ul>';
+      }
+      const status = b.feito === true ? ' <span class="semana-feito">✓ feito</span>' : b.feito === false ? ' <span class="semana-previsto">(previsto)</span>' : '';
+      return '<div class="semana-bloco"><span class="semana-bloco-icon">' + b.icon + '</span><div class="semana-bloco-info"><p class="semana-bloco-nome">' + b.nome + status + '</p>' + exList + '</div></div>';
+    }).join('');
+    return '<div class="semana-dia-card' + (dia.isHoje ? ' hoje' : '') + '"><p class="semana-dia-label">' + dataLabel + (dia.isHoje ? ' · HOJE' : '') + '</p>' + blocosHtml + '</div>';
+  }).join('');
 }
 
 function renderMonthSummary() {
@@ -785,7 +884,8 @@ function renderMonthSummary() {
 
 function renderNextCards() {
   let html = '';
-  const proximaConquista = ACHIEVEMENTS_DEFS.find(a => !(gamificacao.conquistas || {})[a.id]);
+  const ativasParaProximoMarco = new Set(getConquistasAtivas());
+  const proximaConquista = ACHIEVEMENTS_DEFS.find(a => ativasParaProximoMarco.has(a.id) && !(gamificacao.conquistas || {})[a.id]);
   if (proximaConquista) {
     html += '<div class="next-card" data-tab="evolucao"><span class="next-icon">' + proximaConquista.icon + '</span><div class="next-info"><p class="next-label">Próximo marco</p><p class="next-name">' + proximaConquista.nome + '</p><p class="next-desc">' + proximaConquista.desc + '</p></div><span class="next-arrow">→</span></div>';
   }
@@ -928,7 +1028,7 @@ function renderForcaExercicios() {
       '<button type="button" class="unidade-btn' + (unidade === 'kg' ? ' active' : '') + '" data-unidade-toggle="' + idx + '" data-val="kg">kg</button>' +
       '<button type="button" class="unidade-btn' + (unidade === 'lb' ? ' active' : '') + '" data-unidade-toggle="' + idx + '" data-val="lb">lb</button>' +
       '</div>' +
-      '<div class="serie-row serie-row-head"><span>Nº</span><span>Reps</span><span>Carga (' + unidade + ')</span><span>RPE</span><span></span></div>' +
+      '<div class="serie-row serie-row-head"><span>Nº</span><span>Reps</span><span>Carga (' + unidade + ')</span><span>RPE <button type="button" class="rpe-info-btn" data-rpe-info="1">ⓘ</button></span><span></span></div>' +
       seriesRows +
       '<button type="button" class="btn-add-serie" data-add-serie="' + idx + '">+ Série</button>' +
       '</div>';
@@ -951,6 +1051,10 @@ function syncForcaFromDOM() {
 }
 
 function handleSmBodyClick(e) {
+  if (e.target.closest('[data-rpe-info]')) {
+    document.getElementById('rpe-info-modal').classList.remove('hidden');
+    return;
+  }
   const addEx = e.target.closest('#btn-add-exercicio');
   const addSerie = e.target.closest('[data-add-serie]');
   const remSerie = e.target.closest('[data-remove-serie]');
@@ -1349,34 +1453,45 @@ function updateGamificacaoAfterSessao(sessao, isToday) {
 
   if (sessao.tipo === 'forca' && sessao.exercicios && sessao.exercicios.length) {
     gamificacao.ranksMusculares = gamificacao.ranksMusculares || {};
-    const gruposTocados = new Set();
+    // XP por grupo muscular = soma de (carga_kg × reps) de cada série daquele grupo
+    // NESSA sessão, com teto diário — evita saltos de várias faixas de rank num treino só.
+    const xpBrutoPorGrupoNaSessao = {};
     sessao.exercicios.forEach(ex => {
       const info = cachedExercicios[ex.exercicioId];
       if (!info) return;
-      gruposTocados.add(info.grupo);
-      const volume = ex.series.reduce((sum, s) => sum + (s.reps * pesoEmKg(s)), 0);
-      const maxCarga = Math.max(0, ...ex.series.map(pesoEmKg));
-      const r = gamificacao.ranksMusculares[info.grupo] || { pontos: 0 };
+      const xpSerie = ex.series.reduce((sum, s) => sum + (s.reps * pesoEmKg(s)), 0);
+      xpBrutoPorGrupoNaSessao[info.grupo] = (xpBrutoPorGrupoNaSessao[info.grupo] || 0) + xpSerie;
+    });
+    Object.keys(xpBrutoPorGrupoNaSessao).forEach(grupo => {
+      const xpGanho = Math.min(xpBrutoPorGrupoNaSessao[grupo], XP_MAX_DIARIO_POR_GRUPO);
+      const r = gamificacao.ranksMusculares[grupo] || { pontos: 0 };
       const pontosAntes = r.pontos || 0;
-      r.pontos = pontosAntes + volume + maxCarga * 5;
-      gamificacao.ranksMusculares[info.grupo] = r;
+      r.pontos = pontosAntes + xpGanho;
+      gamificacao.ranksMusculares[grupo] = r;
       if (!resultado.novoRank && getTierForPoints(pontosAntes).id !== getTierForPoints(r.pontos).id) {
-        const grupoInfo = GRUPOS_MUSCULARES.find(x => x.id === info.grupo);
+        const grupoInfo = GRUPOS_MUSCULARES.find(x => x.id === grupo);
         resultado.novoRank = { grupoNome: grupoInfo.nome, tierNome: getTierForPoints(r.pontos).nome };
       }
     });
-    gamificacao.proximoIndiceForca = ((gamificacao.proximoIndiceForca || 0) + 1) % planoForca.sequencia.length;
+    // O plano de resistência ativo é o de força só quando o overlay é do modo Ironman ou
+    // objetivo="forca"; caso contrário é o de emagrecimento — cada um com sua própria sequência.
+    const planoRotacao = profile.modoIronman ? planoForca : getPlanoResistenciaAtivo();
+    if (planoRotacao && planoRotacao.sequencia && planoRotacao.sequencia.length) {
+      gamificacao.proximoIndiceForca = ((gamificacao.proximoIndiceForca || 0) + 1) % planoRotacao.sequencia.length;
+    }
   }
 
   if (['corrida', 'natacao', 'bike', 'brick'].includes(sessao.tipo)) {
     gamificacao.ranksDisciplinas = gamificacao.ranksDisciplinas || {};
     const addDist = (disc, km) => {
-      const r = gamificacao.ranksDisciplinas[disc] || { km: 0 };
-      const antes = r.km || 0;
-      r.km = antes + km;
+      const r = gamificacao.ranksDisciplinas[disc] || { km: 0, xp: 0 };
+      const xpAntes = r.xp || 0;
+      const xpGanho = Math.min(km * (XP_POR_KM_DISCIPLINA[disc] || 1), XP_MAX_DIARIO_POR_GRUPO);
+      r.km = (r.km || 0) + km;
+      r.xp = xpAntes + xpGanho;
       gamificacao.ranksDisciplinas[disc] = r;
-      if (!resultado.novoRank && getTierForPoints(antes * 10).id !== getTierForPoints(r.km * 10).id) {
-        resultado.novoRank = { grupoNome: TIPO_LABELS[disc], tierNome: getTierRankDisciplina(disc, r.km).nome };
+      if (!resultado.novoRank && getTierForPoints(xpAntes).id !== getTierForPoints(r.xp).id) {
+        resultado.novoRank = { grupoNome: TIPO_LABELS[disc], tierNome: getTierForPoints(r.xp).nome };
       }
     };
     if (sessao.tipo === 'corrida') addDist('corrida', sessao.distancia || 0);
@@ -1395,19 +1510,14 @@ function updateGamificacaoAfterSessao(sessao, isToday) {
   return resultado;
 }
 
-function getTierRankDisciplina(disciplina, km) {
-  const thresholds = DISCIPLINE_RANK_KM[disciplina];
-  let idx = 0;
-  thresholds.forEach((min, i) => { if (km >= min) idx = i; });
-  return RANK_TIERS[idx];
-}
-
 // Cada perfil acompanha só as conquistas relevantes pro seu objetivo por padrão
 // (ex: quem não corre não vê metas de corrida), mas pode customizar em Mais → Minhas Conquistas.
 function defaultConquistasParaObjetivo() {
   if (profile.modoIronman) return ACHIEVEMENTS_DEFS.map(a => a.id);
   const universais = ['dez-treinos-mes', 'recorde-carga', 'streak-30'];
   if (profile.objetivo === 'corrida') return universais.concat(['primeira-corrida-5k', 'dois-digitos', 'meia-maratona', 'pace-sub-8']);
+  if (profile.objetivo === 'emagrecimento') return universais.concat(['perda-peso-5', 'perda-peso-10', 'perda-peso-15']);
+  if (profile.objetivo === 'forca') return universais.concat(['ganho-muscular-2', 'ganho-muscular-5', 'ganho-muscular-10', 'leg-press-200', 'leg-press-250', 'leg-press-300', 'rosca-halter-12', 'rosca-halter-16', 'rosca-halter-20']);
   return universais;
 }
 function getConquistasAtivas() {
@@ -1445,6 +1555,30 @@ function checkAchievements() {
     });
   });
   if (novoRecorde) unlock('recorde-carga');
+
+  // Pico de carga em exercícios específicos (independente de reps)
+  const pesoMaxLegPress = cargasPorExercicio['leg-press-45'] || 0;
+  if (pesoMaxLegPress >= 200) unlock('leg-press-200');
+  if (pesoMaxLegPress >= 250) unlock('leg-press-250');
+  if (pesoMaxLegPress >= 300) unlock('leg-press-300');
+  const pesoMaxRoscaHalter = cargasPorExercicio['rosca-direta-halter'] || 0;
+  if (pesoMaxRoscaHalter >= 12) unlock('rosca-halter-12');
+  if (pesoMaxRoscaHalter >= 16) unlock('rosca-halter-16');
+  if (pesoMaxRoscaHalter >= 20) unlock('rosca-halter-20');
+
+  // % de peso perdido / ganho de massa muscular (composição corporal) desde o 1º registro
+  const metricasBio = calcularMetricasBio();
+  if (metricasBio) {
+    if (metricasBio.pesoPerdidoPct >= 5) unlock('perda-peso-5');
+    if (metricasBio.pesoPerdidoPct >= 10) unlock('perda-peso-10');
+    if (metricasBio.pesoPerdidoPct >= 15) unlock('perda-peso-15');
+    if (metricasBio.ganhoMassaMuscularPct != null) {
+      if (metricasBio.ganhoMassaMuscularPct >= 2) unlock('ganho-muscular-2');
+      if (metricasBio.ganhoMassaMuscularPct >= 5) unlock('ganho-muscular-5');
+      if (metricasBio.ganhoMassaMuscularPct >= 10) unlock('ganho-muscular-10');
+    }
+  }
+
   return novas;
 }
 
@@ -1473,6 +1607,9 @@ function recomputarGamificacao() {
       gamificacao.conquistas[r.achievementId] = { desbloqueadaEm: new Date().toISOString() };
     }
   });
+  // Garante que conquistas baseadas só em bioimpedância (sem nenhuma sessão) também sejam
+  // avaliadas, já que o loop de sessões acima pode não rodar nenhuma vez (ex: sem sessões ainda).
+  checkAchievements();
   return Object.keys(gamificacao.conquistas)
     .filter(id => !conquistasAntes.has(id))
     .map(id => ACHIEVEMENTS_DEFS.find(a => a.id === id))
@@ -1538,6 +1675,27 @@ function getBioOrdenado() {
   return Object.entries(cachedBio).map(([id, b]) => ({ id, ...b })).sort((a, b) => new Date(a.data) - new Date(b.data));
 }
 
+// % (não kg) pra fazer sentido pra pesos iniciais bem diferentes, e pra não pressionar
+// ninguém a ultrapassar seu peso saudável só pra bater uma meta fixa. Massa muscular é
+// comparada como % do peso corporal em cada ponto (não kg absoluto), pra refletir mudança
+// de composição corporal mesmo quando o peso total também está variando.
+function calcularMetricasBio() {
+  const ordered = getBioOrdenado();
+  if (ordered.length < 2) return null;
+  const primeiro = ordered[0];
+  const atual = ordered[ordered.length - 1];
+  if (primeiro.peso == null || atual.peso == null || !primeiro.peso) return null;
+  const pesoPerdidoKg = primeiro.peso - atual.peso;
+  const pesoPerdidoPct = (pesoPerdidoKg / primeiro.peso) * 100;
+  let ganhoMassaMuscularPct = null;
+  if (primeiro.massaMuscular != null && atual.massaMuscular != null) {
+    const primeiraMassaPct = (primeiro.massaMuscular / primeiro.peso) * 100;
+    const atualMassaPct = (atual.massaMuscular / atual.peso) * 100;
+    ganhoMassaMuscularPct = atualMassaPct - primeiraMassaPct;
+  }
+  return { pesoPerdidoKg, pesoPerdidoPct, ganhoMassaMuscularPct };
+}
+
 function renderSaudeTab() {
   renderSemaforos();
   renderBioCharts();
@@ -1566,6 +1724,17 @@ function renderSemaforos() {
   if (last.massaMuscular != null) {
     const subiu = !prev || prev.massaMuscular == null || last.massaMuscular >= prev.massaMuscular;
     html += semaforoCard(subiu ? 'verde' : 'amarelo', '\u{1F4AA} Massa Muscular', last.massaMuscular.toFixed(1) + ' kg', subiu ? 'Subindo — continue assim!' : 'Caiu desde o último registro');
+  }
+  const metricas = calcularMetricasBio();
+  if (metricas) {
+    const perdeu = metricas.pesoPerdidoPct > 0;
+    const estavel = Math.abs(metricas.pesoPerdidoPct) < 0.1;
+    const textoPeso = estavel ? 'Peso estável desde o início' : perdeu ? (metricas.pesoPerdidoPct.toFixed(1) + '% perdido desde o início') : ((-metricas.pesoPerdidoPct).toFixed(1) + '% de ganho desde o início');
+    html += semaforoCard(estavel ? 'verde' : perdeu ? 'verde' : 'amarelo', '\u{2696}\u{FE0F} Peso (desde o início)', (estavel ? '0' : Math.abs(metricas.pesoPerdidoPct).toFixed(1)) + '%', textoPeso);
+    if (metricas.ganhoMassaMuscularPct != null) {
+      const subiuComposicao = metricas.ganhoMassaMuscularPct > 0;
+      html += semaforoCard(subiuComposicao ? 'verde' : 'amarelo', '\u{1F9BE} Massa Muscular (composição)', (subiuComposicao ? '+' : '') + metricas.ganhoMassaMuscularPct.toFixed(1) + 'pp', subiuComposicao ? 'Ganhando massa em relação ao peso total' : 'Sem variação relevante ainda');
+    }
   }
   container.innerHTML = html || '<p class="empty-state">Preencha peso, água, visceral e massa muscular para ver os indicadores.</p>';
 }
@@ -1617,6 +1786,11 @@ async function handleBioSave() {
   cachedBio[id] = rec;
   hideModal('bio-modal');
   renderSaudeTab();
+  const novasConquistas = checkAchievements();
+  if (novasConquistas.length) {
+    await saveGamificacao();
+    novasConquistas.forEach(a => celebrate(a.icon, a.nome, 'Conquista desbloqueada!'));
+  }
   await db.collection('users').doc(currentUser.uid).collection('bioimpedancia').doc(id).set(rec);
 }
 
@@ -1627,7 +1801,9 @@ async function handleBioDelete() {
   delete cachedBio[id];
   hideModal('bio-modal');
   renderSaudeTab();
+  recomputarGamificacao();
   await db.collection('users').doc(currentUser.uid).collection('bioimpedancia').doc(id).delete();
+  await saveGamificacao();
 }
 
 // ═══ Chart.js helpers ═══
@@ -1708,23 +1884,17 @@ function renderRanksMusculares() {
   }).join('');
 }
 
-function getTierRankDisciplina(disciplina, km) {
-  const thresholds = DISCIPLINE_RANK_KM[disciplina];
-  let idx = 0;
-  thresholds.forEach((min, i) => { if (km >= min) idx = i; });
-  return RANK_TIERS[idx];
-}
-
 function renderRanksDisciplinas() {
   const discs = ['natacao', 'bike', 'corrida'];
   const container = document.getElementById('ranks-disciplinas');
   container.innerHTML = discs.map(d => {
-    const km = (gamificacao.ranksDisciplinas && gamificacao.ranksDisciplinas[d] && gamificacao.ranksDisciplinas[d].km) || 0;
-    const tier = getTierRankDisciplina(d, km);
-    const thresholds = DISCIPLINE_RANK_KM[d];
+    const dados = (gamificacao.ranksDisciplinas && gamificacao.ranksDisciplinas[d]) || { km: 0, xp: 0 };
+    const km = dados.km || 0;
+    const xp = dados.xp || 0;
+    const tier = getTierForPoints(xp);
     const tierIdx = RANK_TIERS.findIndex(t => t.id === tier.id);
-    const proximoMin = thresholds[tierIdx + 1];
-    const pct = proximoMin ? Math.min(100, Math.round(((km - thresholds[tierIdx]) / (proximoMin - thresholds[tierIdx])) * 100)) : 100;
+    const proximo = RANK_TIERS[tierIdx + 1];
+    const pct = proximo ? Math.min(100, Math.round(((xp - tier.min) / (proximo.min - tier.min)) * 100)) : 100;
     return '<div class="rank-card"><div class="rank-icon">' + TIPO_ICONS[d] + '</div><div class="rank-group-name">' + TIPO_LABELS[d] + '</div>' +
       '<div class="rank-tier-name" style="color:' + tier.color + '">' + tier.nome + '</div>' +
       '<div class="rank-bar-bg"><div class="rank-bar-fill" style="width:' + pct + '%;background:' + tier.color + '"></div></div>' +

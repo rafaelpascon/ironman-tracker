@@ -111,6 +111,7 @@
                 <p class="section-date" id="today-date"></p>
                 <p class="today-phase" id="today-phase"></p>
                 <div id="today-blocks"></div>
+                <button type="button" id="btn-ver-semana" class="link-secundario">📅 Ver semana completa</button>
             </section>
 
             <section class="section next-cards-section" id="next-cards-section"></section>
@@ -149,7 +150,7 @@
             </section>
 
             <section class="section">
-                <h3 class="section-title">Esta Semana</h3>
+                <div class="section-header-row"><h3 class="section-title">Esta Semana</h3><span class="week-count-text" id="week-count-text"></span></div>
                 <div id="week-days" class="week-days"></div>
             </section>
 
@@ -439,6 +440,36 @@
             <div class="modal-actions">
                 <button id="import-validate" class="btn-primary">Validar &amp; Salvar</button>
                 <button id="import-cancel" class="btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: explicação da escala de RPE -->
+    <div id="rpe-info-modal" class="modal-overlay hidden">
+        <div class="modal modal-center">
+            <h3 class="modal-title">Escala de RPE</h3>
+            <div class="rpe-info-text">
+                <p><b>RPE 10</b> — Falha total, não daria pra fazer nenhuma repetição a mais</p>
+                <p><b>RPE 9</b> — Sobrava 1 repetição</p>
+                <p><b>RPE 8</b> — Sobravam 2 repetições</p>
+                <p><b>RPE 7</b> — Sobravam 3 repetições</p>
+                <p><b>RPE ≤6</b> — Esforço leve/moderado, sobravam 4+ repetições</p>
+            </div>
+            <div class="modal-actions">
+                <button id="rpe-info-fechar" class="btn-secondary">Entendi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Semana completa (somente leitura) -->
+    <div id="semana-modal" class="modal-overlay hidden">
+        <div class="modal modal-scroll-fixed">
+            <h3 class="modal-title">📅 Semana Completa</h3>
+            <div class="modal-scroll-area">
+                <div id="semana-completa-list"></div>
+            </div>
+            <div class="modal-actions modal-actions-fixed">
+                <button id="semana-fechar" class="btn-secondary">Fechar</button>
             </div>
         </div>
     </div>

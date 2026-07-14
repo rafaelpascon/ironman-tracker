@@ -1,4 +1,4 @@
-const CACHE = 'ironfit-v1';
+const CACHE = 'ironfit-v2';
 const SHELL = [
   './',
   './index.html',
@@ -25,6 +25,9 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
+// Network-first: sempre tenta buscar a versão mais nova do app quando online (essencial
+// pra um app em atualização ativa), e só cai pro cache se a rede falhar — mantendo o
+// app usável offline sem travar todo mundo numa versão antiga até o próximo bump de CACHE.
 self.addEventListener('fetch', e => {
   const url = e.request.url;
   if (url.includes('firestore.googleapis.com') ||
@@ -33,6 +36,10 @@ self.addEventListener('fetch', e => {
     return;
   }
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
+    fetch(e.request).then(resp => {
+      const copia = resp.clone();
+      caches.open(CACHE).then(c => c.put(e.request, copia));
+      return resp;
+    }).catch(() => caches.match(e.request))
   );
 });

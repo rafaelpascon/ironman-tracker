@@ -339,6 +339,7 @@ select { width: 100%; padding: 14px 16px; border: 1px solid var(--border); borde
 .btn-chip { padding: 10px 16px; min-height: 44px; border-radius: var(--radius-sm); background: var(--accent-bg); border: 1px solid var(--accent); color: var(--accent); font-weight: 700; font-size: 13px; cursor: pointer; -webkit-appearance: none; }
 .section-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .section-header-row .section-title { margin-bottom: 0; }
+.week-count-text { font-size: 13px; font-weight: 700; color: var(--accent); }
 
 /* ═══ Session history cards (Treinos tab) ═══ */
 .treino-card { background: var(--surface); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; border: 1px solid var(--border); border-left: 4px solid var(--border); display: flex; align-items: center; gap: 14px; }
@@ -427,6 +428,30 @@ select { width: 100%; padding: 14px 16px; border: 1px solid var(--border); borde
 .plan-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .plan-row .plan-info { flex: 1; }
 .plan-row .btn-chip { flex-shrink: 0; white-space: nowrap; }
+
+/* ═══ RPE info ═══ */
+.rpe-info-btn { background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; padding: 0 0 0 2px; -webkit-appearance: none; vertical-align: middle; }
+.rpe-info-text { text-align: left; margin-bottom: 8px; }
+.rpe-info-text p { font-size: 13px; color: var(--text-secondary); line-height: 1.8; }
+.rpe-info-text b { color: var(--text); }
+
+/* ═══ Link secundário (ex: Ver semana completa) ═══ */
+.link-secundario { display: block; width: 100%; background: none; border: none; padding: 14px; min-height: 44px; margin-top: 4px; color: var(--text-secondary); font-size: 14px; font-weight: 600; text-align: center; cursor: pointer; -webkit-appearance: none; }
+.link-secundario:active { color: var(--text); }
+
+/* ═══ Semana completa (somente leitura) ═══ */
+.semana-dia-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
+.semana-dia-card.hoje { border-color: var(--accent); }
+.semana-dia-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 10px; }
+.semana-dia-card.hoje .semana-dia-label { color: var(--accent); }
+.semana-bloco { display: flex; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); }
+.semana-bloco:first-of-type { border-top: none; padding-top: 0; }
+.semana-bloco-icon { font-size: 22px; flex-shrink: 0; }
+.semana-bloco-nome { font-size: 14px; font-weight: 700; }
+.semana-feito { color: var(--success); font-size: 12px; font-weight: 700; }
+.semana-previsto { color: var(--text-muted); font-size: 12px; font-weight: 600; }
+.semana-exercicios { list-style: none; margin-top: 6px; display: flex; flex-direction: column; gap: 3px; }
+.semana-exercicios li { font-size: 12px; color: var(--text-secondary); }
 
 /* ═══ Responsive: wider viewports (tablet/desktop preview) ═══ */
 .pulse { animation: checkPop 0.5s ease; }
