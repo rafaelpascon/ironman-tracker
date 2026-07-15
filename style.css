@@ -341,6 +341,20 @@ select { width: 100%; padding: 14px 16px; border: 1px solid var(--border); borde
 .section-header-row .section-title { margin-bottom: 0; }
 .week-count-text { font-size: 13px; font-weight: 700; color: var(--accent); }
 
+/* ═══ Configurações: lista de conquistas (com descrição) ═══ */
+.conquista-cfg-list { display: flex; flex-direction: column; gap: 8px; }
+.conquista-cfg-row { display: flex; align-items: center; gap: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.conquista-cfg-row.ativa { border-color: var(--accent); background: var(--accent-bg); }
+.conquista-cfg-icon { font-size: 22px; flex-shrink: 0; }
+.conquista-cfg-info { flex: 1; min-width: 0; }
+.conquista-cfg-nome { font-size: 14px; font-weight: 700; }
+.conquista-cfg-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; line-height: 1.4; }
+.conquista-cfg-toggle { font-size: 16px; font-weight: 800; color: var(--accent); width: 20px; text-align: center; flex-shrink: 0; }
+
+/* ═══ Data do treino (registro retroativo) ═══ */
+.sm-data-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+#sm-data:disabled { opacity: 0.6; }
+
 /* ═══ Session history cards (Treinos tab) ═══ */
 .treino-card { background: var(--surface); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; border: 1px solid var(--border); border-left: 4px solid var(--border); display: flex; align-items: center; gap: 14px; }
 .treino-card.forca { border-left-color: var(--forca); }

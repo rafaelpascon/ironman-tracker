@@ -496,8 +496,8 @@ function setupEvents() {
   });
   document.getElementById('cfg-save').addEventListener('click', handleProfileUpdate);
   document.getElementById('cfg-conquistas').addEventListener('click', e => {
-    const chip = e.target.closest('.chip');
-    if (chip) toggleConquistaAtiva(chip.dataset.id);
+    const row = e.target.closest('.conquista-cfg-row');
+    if (row) toggleConquistaAtiva(row.dataset.id);
   });
   document.getElementById('btn-reset-forca').addEventListener('click', () => resetPlano('forca'));
   document.getElementById('btn-reset-emagrecimento').addEventListener('click', () => resetPlano('emagrecimento'));
@@ -941,12 +941,40 @@ function showTipoModal() { document.getElementById('tipo-modal').classList.remov
 let smDiaPrescrito = null;
 let pendingExerciseBlockIdx = null;
 
+// Registro retroativo: só pra entradas manuais (aba Treinos), até 7 dias atrás — o bloco
+// "hoje" fica travado na data de hoje, senão a lógica de bloco concluído do dia fica confusa.
+const DIAS_RETROATIVOS_PERMITIDOS = 7;
+
+// Lê a data escolhida no campo #sm-data, com trava de segurança (nunca no futuro, nunca
+// além da janela retroativa permitida) mesmo que o input tenha sido manipulado.
+function getDataSessaoSelecionada() {
+  const hoje = fmtDate(new Date());
+  const limite = new Date(); limite.setDate(limite.getDate() - DIAS_RETROATIVOS_PERMITIDOS);
+  const limiteStr = fmtDate(limite);
+  const valor = document.getElementById('sm-data').value;
+  if (!valor) return hoje;
+  if (valor > hoje) return hoje;
+  if (valor < limiteStr) return limiteStr;
+  return valor;
+}
+
 function openSessionModal(tipo, subs, origem, prefillSessao, diaPrescrito) {
   smTipo = tipo; smSubs = subs || null; smOrigem = origem; smDiaPrescrito = diaPrescrito || null;
   buildSessionForm(tipo, prefillSessao);
   document.getElementById('sm-error').textContent = '';
   const hasHistorico = Object.values(cachedSessoes).some(s => s.tipo === tipo);
   document.getElementById('sm-duplicate').classList.toggle('hidden', !hasHistorico);
+
+  const hoje = new Date();
+  const limite = new Date(hoje); limite.setDate(limite.getDate() - DIAS_RETROATIVOS_PERMITIDOS);
+  const dataInput = document.getElementById('sm-data');
+  dataInput.value = fmtDate(hoje);
+  dataInput.min = fmtDate(limite);
+  dataInput.max = fmtDate(hoje);
+  const ehTreinoDeHoje = origem === 'hoje';
+  dataInput.disabled = ehTreinoDeHoje;
+  document.getElementById('sm-data-hoje-hint').classList.toggle('hidden', !ehTreinoDeHoje);
+
   document.getElementById('session-modal').classList.remove('hidden');
 }
 
@@ -1253,7 +1281,7 @@ function formatMinutes(min) {
 }
 
 function collectSessionForm(tipo) {
-  const dataStr = fmtDate(new Date());
+  const dataStr = getDataSessaoSelecionada();
   if (tipo === 'forca') {
     syncForcaFromDOM();
     const exercicios = smForcaExercicios.filter(e => e.exercicioId).map(e => {
@@ -1334,7 +1362,10 @@ async function saveSessaoAndCelebrate(sessao) {
   const id = ref.id;
   cachedSessoes[id] = sessao;
   const isToday = sessao.data === fmtDate(new Date());
-  const resultado = updateGamificacaoAfterSessao(sessao, isToday);
+  // Treino retroativo: não dá pra só "incrementar" o streak no momento do salvamento — a
+  // sessão pode estar preenchendo uma lacuna no meio da sequência. Recalcula tudo do zero
+  // considerando a data preenchida, em vez do caminho incremental usado para o dia de hoje.
+  const resultado = isToday ? updateGamificacaoAfterSessao(sessao, true) : recomputarGamificacaoComResultado();
   renderAll();
   if (currentTab === 'treinos') renderTreinosTab();
   animateFeedback();
@@ -1614,6 +1645,42 @@ function recomputarGamificacao() {
     .filter(id => !conquistasAntes.has(id))
     .map(id => ACHIEVEMENTS_DEFS.find(a => a.id === id))
     .filter(Boolean);
+}
+
+// Mesmo recálculo do zero, mas devolvendo um resultado no formato de updateGamificacaoAfterSessao
+// (xpGanho/subiuNivel/novoRank), pra sessões retroativas ainda mostrarem o mesmo feedback visual
+// (toast de XP, popup de nível/rank) que uma sessão de hoje mostraria.
+function recomputarGamificacaoComResultado() {
+  const nivelAntes = gamificacao.nivel || 1;
+  const xpAntes = gamificacao.xp || 0;
+  const ranksMuscularesAntes = JSON.parse(JSON.stringify(gamificacao.ranksMusculares || {}));
+  const ranksDisciplinasAntes = JSON.parse(JSON.stringify(gamificacao.ranksDisciplinas || {}));
+
+  const novasConquistas = recomputarGamificacao();
+
+  let novoRank = null;
+  Object.keys(gamificacao.ranksMusculares || {}).forEach(g => {
+    const antes = (ranksMuscularesAntes[g] && ranksMuscularesAntes[g].pontos) || 0;
+    const depois = gamificacao.ranksMusculares[g].pontos;
+    if (!novoRank && getTierForPoints(antes).id !== getTierForPoints(depois).id) {
+      const info = GRUPOS_MUSCULARES.find(x => x.id === g);
+      novoRank = { grupoNome: info.nome, tierNome: getTierForPoints(depois).nome };
+    }
+  });
+  Object.keys(gamificacao.ranksDisciplinas || {}).forEach(d => {
+    const antes = (ranksDisciplinasAntes[d] && ranksDisciplinasAntes[d].xp) || 0;
+    const depois = gamificacao.ranksDisciplinas[d].xp || 0;
+    if (!novoRank && getTierForPoints(antes).id !== getTierForPoints(depois).id) {
+      novoRank = { grupoNome: TIPO_LABELS[d], tierNome: getTierForPoints(depois).nome };
+    }
+  });
+
+  return {
+    xpGanho: Math.max(0, (gamificacao.xp || 0) - xpAntes),
+    novasConquistas,
+    subiuNivel: (gamificacao.nivel || 1) > nivelAntes,
+    novoRank
+  };
 }
 
 // ╔══════════════════════════════════════════════════════════════╗
@@ -2104,9 +2171,14 @@ function renderMaisTab() {
 
 function renderCfgConquistas() {
   const ativas = new Set(getConquistasAtivas());
-  document.getElementById('cfg-conquistas').innerHTML = ACHIEVEMENTS_DEFS.map(a =>
-    '<button type="button" class="chip' + (ativas.has(a.id) ? ' active' : '') + '" data-id="' + a.id + '">' + a.icon + ' ' + a.nome + '</button>'
-  ).join('');
+  document.getElementById('cfg-conquistas').innerHTML = ACHIEVEMENTS_DEFS.map(a => {
+    const ativa = ativas.has(a.id);
+    return '<div class="conquista-cfg-row' + (ativa ? ' ativa' : '') + '" data-id="' + a.id + '">' +
+      '<span class="conquista-cfg-icon">' + a.icon + '</span>' +
+      '<div class="conquista-cfg-info"><p class="conquista-cfg-nome">' + a.nome + '</p><p class="conquista-cfg-desc">' + a.desc + '</p></div>' +
+      '<span class="conquista-cfg-toggle">' + (ativa ? '✓' : '') + '</span>' +
+      '</div>';
+  }).join('');
 }
 
 async function toggleConquistaAtiva(id) {

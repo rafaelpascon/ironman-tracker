@@ -297,7 +297,7 @@
                 <h3 class="section-title">🏆 Minhas Conquistas</h3>
                 <div class="more-card">
                     <p class="plan-info">Escolha quais conquistas você quer acompanhar na aba Evolução.</p>
-                    <div class="chip-row" id="cfg-conquistas"></div>
+                    <div class="conquista-cfg-list" id="cfg-conquistas"></div>
                 </div>
             </section>
 
@@ -329,6 +329,11 @@
         <div class="modal modal-scroll-fixed">
             <h3 class="modal-title" id="sm-title">Registrar Treino</h3>
             <div class="modal-scroll-area">
+                <div class="modal-field" id="sm-data-field">
+                    <label>Data do treino</label>
+                    <input type="date" id="sm-data">
+                    <p class="sm-data-hint hidden" id="sm-data-hoje-hint">Treino do plano de hoje — data fixa.</p>
+                </div>
                 <button id="sm-duplicate" class="btn-secondary sm-duplicate hidden">↻ Repetir treino anterior</button>
                 <div id="sm-body"></div>
                 <p id="sm-error" class="error-text"></p>
