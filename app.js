@@ -79,13 +79,15 @@ const EXERCICIOS_DEFAULT = [
 ];
 
 // ═══ Plano de Força — estilo Anatoly (todos os usuários) ═══
+// dias[] é indexado por diaSemana FIXO (0=domingo...6=sábado) — cada dia da semana sempre
+// mostra o mesmo treino, não uma fila que anda conforme sessões são registradas.
 const PLANO_FORCA_ANATOLY = {
   nome: 'Anatoly — Base de Força',
   descricao: 'Foco em técnica e progressão de carga nos básicos (agachamento, supino, terra). Sem volume de hipertrofia — força relativa ao peso corporal.',
   duracaoSemanas: 6,
-  diasSemana: [1, 3, 5],
-  sequencia: [
+  dias: [
     {
+      diaSemana: 1,
       nome: 'Dia A — Agachamento & Push',
       exercicios: [
         { exercicioId: 'agachamento-livre', series: 5, repsMin: 3, repsMax: 5 },
@@ -96,6 +98,7 @@ const PLANO_FORCA_ANATOLY = {
       mobilidade: ['Mobilidade de quadril — 10 min', 'Alongamento de peitoral e ombro — 5 min']
     },
     {
+      diaSemana: 3,
       nome: 'Dia B — Terra & Pull',
       exercicios: [
         { exercicioId: 'levantamento-terra', series: 5, repsMin: 3, repsMax: 5 },
@@ -106,6 +109,7 @@ const PLANO_FORCA_ANATOLY = {
       mobilidade: ['Mobilidade de tornozelo — 10 min', 'Mobilidade torácica (cat-cow) — 5 min']
     },
     {
+      diaSemana: 5,
       nome: 'Dia A — Agachamento & Push (variação)',
       exercicios: [
         { exercicioId: 'agachamento-livre', series: 5, repsMin: 3, repsMax: 5 },
@@ -123,22 +127,20 @@ const PLANO_EMAGRECIMENTO_SEED = {
   nome: 'Emagrecimento — Bloco 1',
   descricao: 'Circuito full-body 3x/semana, foco em volume moderado e gasto calórico — não em carga máxima.',
   duracaoSemanas: 4,
-  diasSemana: [1, 3, 5],
   progressao: 'aumentar reps até o topo da faixa antes de aumentar carga; priorizar completar o circuito com menos descanso ao longo das semanas',
-  sequencia: [
-    {
-      nome: 'Circuito Full Body',
-      exercicios: [
-        { exercicioId: 'agachamento-livre', series: 3, repsMin: 12, repsMax: 15, descansoSeg: 45 },
-        { exercicioId: 'remada-sentada', series: 3, repsMin: 12, repsMax: 15, descansoSeg: 45 },
-        { exercicioId: 'leg-press-45', series: 3, repsMin: 12, repsMax: 15, descansoSeg: 45 },
-        { exercicioId: 'desenvolvimento-ombros-maquina', series: 3, repsMin: 12, repsMax: 15, descansoSeg: 45 },
-        { exercicioId: 'cadeira-extensora', series: 2, repsMin: 15, repsMax: 15, descansoSeg: 30 },
-        { exercicioId: 'cadeira-flexora', series: 2, repsMin: 15, repsMax: 15, descansoSeg: 30 }
-      ],
-      mobilidade: []
-    }
-  ]
+  dias: [1, 3, 5].map(diaSemana => ({
+    diaSemana,
+    nome: 'Circuito Full Body',
+    exercicios: [
+      { exercicioId: 'agachamento-livre', series: 3, repsMin: 12, repsMax: 15, descansoSeg: 45 },
+      { exercicioId: 'remada-sentada', series: 3, repsMin: 12, repsMax: 15, descansoSeg: 45 },
+      { exercicioId: 'leg-press-45', series: 3, repsMin: 12, repsMax: 15, descansoSeg: 45 },
+      { exercicioId: 'desenvolvimento-ombros-maquina', series: 3, repsMin: 12, repsMax: 15, descansoSeg: 45 },
+      { exercicioId: 'cadeira-extensora', series: 2, repsMin: 15, repsMax: 15, descansoSeg: 30 },
+      { exercicioId: 'cadeira-flexora', series: 2, repsMin: 15, repsMax: 15, descansoSeg: 30 }
+    ],
+    mobilidade: []
+  }))
 };
 
 // ═══ Plano Ironman — 5 fases (só modo Ironman) ═══
@@ -233,7 +235,7 @@ const ACHIEVEMENTS_DEFS = [
   { id: 'dez-treinos-mes', nome: 'Ritmo Forte', desc: '10 treinos completados em um mês', icon: '\u{1F4C5}' },
   { id: 'recorde-carga', nome: 'Novo Recorde', desc: 'Bater recorde de carga em um exercício', icon: '\u{1F4C8}' },
   { id: 'pace-sub-8', nome: 'Sub-8', desc: 'Correr com pace abaixo de 8:00/km', icon: '\u{26A1}' },
-  { id: 'streak-30', nome: '30 Dias Sem Parar', desc: 'Streak de 30 dias consecutivos', icon: '\u{1F525}' },
+  { id: 'streak-30', nome: '4 Semanas Seguidas', desc: 'Bater a meta semanal de treinos por 4 semanas consecutivas', icon: '\u{1F525}' },
   { id: 'dois-digitos', nome: 'Dois Dígitos', desc: 'Completar uma corrida de 10 km', icon: '\u{1F51F}' },
   { id: 'meia-maratona', nome: 'Meia Maratona', desc: 'Completar 21 km correndo', icon: '\u{1F396}\u{FE0F}' },
   { id: 'setenta-e-tres', nome: '70.3', desc: 'Cruzar a linha de chegada do Ironman 70.3', icon: '\u{1F947}' },
@@ -349,8 +351,37 @@ async function loadAllData() {
     else if (data.tipo === 'emagrecimento') planoEmagrecimento = { id: d.id, ...data };
     else if (data.tipo === 'ironman') planoIronman = { id: d.id, ...data };
   });
+  // Migração: contas criadas antes desta atualização salvaram o plano no formato antigo
+  // (diasSemana + sequencia rotativa). Migra em memória e persiste de volta, sem perder o
+  // conteúdo de exercícios já cadastrado — o usuário não precisa fazer nada.
+  if (planoForca) {
+    const migrado = migrarPlanoParaFormatoNovo(planoForca);
+    if (migrado !== planoForca) { planoForca = migrado; await db.collection('users').doc(uid).collection('planos').doc(planoForca.id).set(migrado); }
+  }
+  if (planoEmagrecimento) {
+    const migrado = migrarPlanoParaFormatoNovo(planoEmagrecimento);
+    if (migrado !== planoEmagrecimento) { planoEmagrecimento = migrado; await db.collection('users').doc(uid).collection('planos').doc(planoEmagrecimento.id).set(migrado); }
+  }
   gamificacao = gamifSnap.exists ? gamifSnap.data() : defaultGamificacao();
   await garantirPlanoDoObjetivo();
+}
+
+// Formato antigo: { diasSemana:[1,3,5], sequencia:[{nome,exercicios,mobilidade}, ...] } — a
+// sequência rotacionava independente do dia da semana. Formato novo: { dias:[{diaSemana,
+// nome,exercicios,mobilidade}, ...] } — cada dia da semana é fixo. Casa por posição (o dia N
+// de diasSemana usa a entrada N de sequencia, com wrap se sequencia for mais curta — é
+// exatamente como o plano de emagrecimento reaproveitava 1 entrada pros 3 dias).
+function migrarPlanoParaFormatoNovo(plano) {
+  if (plano.dias && plano.dias.length) return plano;
+  if (!plano.diasSemana || !plano.sequencia || !plano.sequencia.length) return plano;
+  const dias = plano.diasSemana.map((diaSemana, i) => {
+    const base = plano.sequencia[i % plano.sequencia.length];
+    return { diaSemana, nome: base.nome, exercicios: base.exercicios, mobilidade: base.mobilidade || [] };
+  });
+  const migrado = { ...plano, dias };
+  delete migrado.diasSemana;
+  delete migrado.sequencia;
+  return migrado;
 }
 
 // Migração/self-heal: garante que o plano correspondente ao objetivo do usuário exista
@@ -371,7 +402,7 @@ async function garantirPlanoDoObjetivo() {
 }
 
 function defaultGamificacao() {
-  return { xp: 0, nivel: 1, streak: 0, ultimoDia: null, descansoSemana: {}, ranksMusculares: {}, ranksDisciplinas: {}, conquistas: {}, proximoIndiceForca: 0 };
+  return { xp: 0, nivel: 1, streak: 0, ranksMusculares: {}, ranksDisciplinas: {}, conquistas: {}, proximoIndiceForca: 0 };
 }
 
 function applyModeVisibility() {
@@ -420,6 +451,7 @@ function setupEvents() {
   });
   document.getElementById('semana-fechar').addEventListener('click', () => hideModal('semana-modal'));
   document.getElementById('rpe-info-fechar').addEventListener('click', () => hideModal('rpe-info-modal'));
+  document.getElementById('sm-data').addEventListener('change', handleSmDataChange);
   document.getElementById('treinos-filtro').addEventListener('click', e => {
     const chip = e.target.closest('.chip');
     if (!chip) return;
@@ -663,11 +695,21 @@ function getPlanoResistenciaAtivo() {
   return null;
 }
 
-function getProximoDiaForca(plano) {
-  const p = plano || getPlanoResistenciaAtivo();
-  if (!p || !p.sequencia || !p.sequencia.length) return null;
-  const idx = (gamificacao.proximoIndiceForca || 0) % p.sequencia.length;
-  return p.sequencia[idx];
+// Rotação por POSIÇÃO (não por dia da semana) — usada só no overlay híbrido do Ironman,
+// onde o dia de força "flutua" (não tem compromisso de dia fixo, é um extra de manutenção).
+function getProximoDiaForcaRotativo(plano) {
+  if (!plano || !plano.dias || !plano.dias.length) return null;
+  const idx = (gamificacao.proximoIndiceForca || 0) % plano.dias.length;
+  return plano.dias[idx];
+}
+
+// Fonte única dia-da-semana → treino agendado, usada por "Hoje", "Ver semana completa" e o
+// pré-preenchimento do registro retroativo — cada dia da semana sempre mostra o mesmo treino,
+// não uma fila que anda conforme sessões são (ou deixam de ser) registradas.
+function getDiaPlanoParaData(date) {
+  const plano = getPlanoResistenciaAtivo();
+  if (!plano || !plano.dias) return null;
+  return plano.dias.find(d => d.diaSemana === date.getDay()) || null;
 }
 
 function isDiaPrescrito(date) {
@@ -678,15 +720,17 @@ function isDiaPrescrito(date) {
     if (fase.forcaDias && fase.forcaDias.includes(weekday)) return true;
     return false;
   }
-  const plano = getPlanoResistenciaAtivo();
-  return !!(plano && plano.diasSemana.includes(weekday));
+  return !!getDiaPlanoParaData(date);
 }
 function isRestDay(date) { return !isDiaPrescrito(date); }
 
+// Overlay híbrido do Ironman: se o dia já foi registrado, mostra o nome real da sessão salva
+// (em vez de reprojetar a rotação, que pode ter andado depois); senão, projeta a partir da
+// posição atual da rotação.
 function getDiaForcaParaBloco(dateStr, plano) {
   const sessaoHoje = Object.values(cachedSessoes).find(s => s.tipo === 'forca' && s.data === dateStr);
   if (sessaoHoje) return { nome: sessaoHoje.planoDia || 'Força', exercicios: [], mobilidade: [] };
-  return getProximoDiaForca(plano);
+  return getProximoDiaForcaRotativo(plano);
 }
 
 function computeTodayBlocks(date) {
@@ -702,11 +746,10 @@ function computeTodayBlocks(date) {
       blocks.push({ tipo: 'forca', nome: dia.nome, duracao: null, icon: '\u{1F4AA}', subs: null, diaForca: dia });
     }
   } else {
-    const plano = getPlanoResistenciaAtivo();
-    if (plano && plano.diasSemana.includes(weekday)) {
-      const dia = getDiaForcaParaBloco(dateStr, plano);
+    const diaPlano = getDiaPlanoParaData(date);
+    if (diaPlano) {
       const icon = profile.objetivo === 'emagrecimento' ? '\u{1F525}' : '\u{1F4AA}';
-      blocks.push({ tipo: 'forca', nome: dia.nome, duracao: null, icon, subs: null, diaForca: dia });
+      blocks.push({ tipo: 'forca', nome: diaPlano.nome, duracao: null, icon, subs: null, diaForca: diaPlano });
     } else {
       blocks.push({ tipo: 'rest', nome: 'Descanso', duracao: null, icon: '\u{1F634}', subs: null, diaForca: null });
     }
@@ -793,6 +836,10 @@ function renderWeek() {
   // Contador específico da SEMANA atual (seg-dom) — separado do resumo mensal logo abaixo,
   // que soma dias de várias semanas e por isso naturalmente mostra um número maior.
   document.getElementById('week-count-text').textContent = feitosNaSemana + '/' + prescritosNaSemana + ' treinos';
+  const semanas = gamificacao.streak || 0;
+  document.getElementById('streak-semanas-text').textContent = semanas > 0
+    ? ('\u{1F525} ' + semanas + (semanas === 1 ? ' semana seguida' : ' semanas seguidas') + ' batendo a meta')
+    : 'Bata a meta desta semana pra começar a sequência \u{1F525}';
 }
 
 // ═══ Ver semana completa (somente leitura) ═══
@@ -816,25 +863,23 @@ function computeSemanaPreview() {
       const fase = getFaseParaData(d);
       const sched = fase.schedule[weekday];
       blocos.push({ tipo: sched.tipo, nome: sched.nome, icon: sched.icon, duracao: sched.duracao, exercicios: null, feito: null });
-      if (fase.forcaDias && fase.forcaDias.includes(weekday) && planoForca && planoForca.sequencia.length) {
+      if (fase.forcaDias && fase.forcaDias.includes(weekday) && planoForca && planoForca.dias.length) {
         if (sessaoForcaDoDia) {
           blocos.push({ tipo: 'forca', nome: sessaoForcaDoDia.planoDia || 'Força', icon: '\u{1F4AA}', exercicios: null, feito: true });
         } else {
-          const dia = planoForca.sequencia[indiceProjetado % planoForca.sequencia.length];
+          const dia = planoForca.dias[indiceProjetado % planoForca.dias.length];
           blocos.push({ tipo: 'forca', nome: dia.nome, icon: '\u{1F4AA}', exercicios: dia.exercicios, feito: false });
           indiceProjetado++;
         }
       }
     } else {
-      const plano = getPlanoResistenciaAtivo();
-      if (plano && plano.diasSemana.includes(weekday)) {
+      const diaPlano = getDiaPlanoParaData(d);
+      if (diaPlano) {
         const icon = profile.objetivo === 'emagrecimento' ? '\u{1F525}' : '\u{1F4AA}';
         if (sessaoForcaDoDia) {
-          blocos.push({ tipo: 'forca', nome: sessaoForcaDoDia.planoDia || 'Força', icon, exercicios: null, feito: true });
-        } else if (plano.sequencia.length) {
-          const dia = plano.sequencia[indiceProjetado % plano.sequencia.length];
-          blocos.push({ tipo: 'forca', nome: dia.nome, icon, exercicios: dia.exercicios, feito: false });
-          indiceProjetado++;
+          blocos.push({ tipo: 'forca', nome: sessaoForcaDoDia.planoDia || diaPlano.nome, icon, exercicios: null, feito: true });
+        } else {
+          blocos.push({ tipo: 'forca', nome: diaPlano.nome, icon, exercicios: diaPlano.exercicios, feito: false });
         }
       } else {
         blocos.push({ tipo: 'rest', nome: 'Descanso', icon: '\u{1F634}', exercicios: null, feito: null });
@@ -958,8 +1003,15 @@ function getDataSessaoSelecionada() {
   return valor;
 }
 
+// true quando o registro de força deve se auto-preencher pelo dia da semana da data
+// selecionada (entrada manual nova); false ao duplicar uma sessão específica do histórico
+// (mantém os dados duplicados) ou no fluxo "hoje" (dia prescrito já vem fixo por parâmetro).
+let smForcaModoManualLivre = false;
+
 function openSessionModal(tipo, subs, origem, prefillSessao, diaPrescrito) {
-  smTipo = tipo; smSubs = subs || null; smOrigem = origem; smDiaPrescrito = diaPrescrito || null;
+  smTipo = tipo; smSubs = subs || null; smOrigem = origem;
+  smForcaModoManualLivre = tipo === 'forca' && !diaPrescrito && !prefillSessao;
+  smDiaPrescrito = smForcaModoManualLivre ? getDiaPlanoParaData(new Date()) : (diaPrescrito || null);
   buildSessionForm(tipo, prefillSessao);
   document.getElementById('sm-error').textContent = '';
   const hasHistorico = Object.values(cachedSessoes).some(s => s.tipo === tipo);
@@ -976,6 +1028,22 @@ function openSessionModal(tipo, subs, origem, prefillSessao, diaPrescrito) {
   document.getElementById('sm-data-hoje-hint').classList.toggle('hidden', !ehTreinoDeHoje);
 
   document.getElementById('session-modal').classList.remove('hidden');
+}
+
+// Reaproveita a mesma fonte dia-da-semana → exercícios agendados usada em "Hoje" e "Ver
+// semana completa": ao trocar a data de um registro manual de força, o checklist re-preenche
+// pelo dia da semana da data escolhida, em vez de ficar genérico/vazio.
+function handleSmDataChange() {
+  if (!smForcaModoManualLivre) return;
+  const obsAtual = document.getElementById('sm-forca-obs') ? document.getElementById('sm-forca-obs').value : '';
+  const dataSelecionada = new Date(document.getElementById('sm-data').value + 'T00:00:00');
+  smDiaPrescrito = getDiaPlanoParaData(dataSelecionada);
+  smForcaExercicios = smDiaPrescrito ? smDiaPrescrito.exercicios.map(e => ({
+    exercicioId: e.exercicioId,
+    unidade: unidadeLembrada(e.exercicioId),
+    series: Array.from({ length: e.series }, () => ({ reps: '', carga: '', rpe: '' }))
+  })) : [];
+  buildForcaFormHTML({ obs: obsAtual });
 }
 
 function buildSessionForm(tipo, prefill) {
@@ -1167,7 +1235,7 @@ function sugestaoProgressao(exercicioId) {
   let repsMax = null;
   for (const plano of [planoForca, planoEmagrecimento]) {
     if (!plano) continue;
-    for (const dia of plano.sequencia) {
+    for (const dia of plano.dias) {
       const found = dia.exercicios.find(e => e.exercicioId === exercicioId);
       if (found) { repsMax = found.repsMax; break; }
     }
@@ -1333,6 +1401,7 @@ function duplicateLastSession() {
   const last = Object.values(cachedSessoes).filter(s => s.tipo === smTipo && s.data !== fmtDate(new Date())).sort((a, b) => new Date(b.data) - new Date(a.data))[0];
   if (!last) return;
   if (smTipo === 'brick' && last.subs) smSubs = last.subs;
+  smForcaModoManualLivre = false;
   buildSessionForm(smTipo, last);
 }
 
@@ -1436,32 +1505,49 @@ function getTierForPoints(pontos) {
   return tier;
 }
 
-function atualizarStreak(dataStr) {
-  if (gamificacao.ultimoDia === dataStr) return;
-  const today = new Date(dataStr + 'T00:00:00');
-  if (!gamificacao.ultimoDia) {
-    gamificacao.streak = 1;
-  } else {
-    const last = new Date(gamificacao.ultimoDia + 'T00:00:00');
-    const diffDays = Math.round((today - last) / 86400000);
-    if (diffDays < 0) return;
-    if (diffDays === 1) {
-      gamificacao.streak = (gamificacao.streak || 0) + 1;
-    } else {
-      let gapOk = true;
-      for (let i = 1; i < diffDays; i++) {
-        const d = new Date(last); d.setDate(d.getDate() + i);
-        if (!isRestDay(d)) {
-          const wk = fmtDate(getMonday(d));
-          gamificacao.descansoSemana = gamificacao.descansoSemana || {};
-          if (!gamificacao.descansoSemana[wk]) gamificacao.descansoSemana[wk] = true;
-          else { gapOk = false; break; }
-        }
-      }
-      gamificacao.streak = gapOk ? (gamificacao.streak || 0) + 1 : 1;
-    }
+// Meta semanal = quantidade de dias agendados no plano ativo do usuário (não um número fixo):
+// força/emagrecimento usam plano.dias.length; Ironman usa a contagem de dias não-rest na
+// fase atual (o overlay de força sempre cai num dia que já tem cardio agendado, então não
+// soma dias extras).
+function getMetaSemanalAtual() {
+  if (profile.modoIronman && planoIronman) {
+    const fase = getFaseAtual();
+    let count = 0;
+    for (let wd = 0; wd <= 6; wd++) { if (fase.schedule[wd].tipo !== 'rest') count++; }
+    return count;
   }
-  gamificacao.ultimoDia = dataStr;
+  const plano = getPlanoResistenciaAtivo();
+  return plano ? plano.dias.length : 0;
+}
+
+function contarDiasTreinadosNaSemana(segunda) {
+  const fim = new Date(segunda); fim.setDate(fim.getDate() + 6);
+  const diasComSessao = new Set();
+  Object.values(cachedSessoes).forEach(s => {
+    const d = new Date(s.data + 'T00:00:00');
+    if (d >= segunda && d <= fim) diasComSessao.add(s.data);
+  });
+  return diasComSessao.size;
+}
+
+// Streak = semanas CONSECUTIVAS (seg-dom) em que o usuário bateu a meta semanal — não dias
+// consecutivos. Só semanas já FECHADAS (antes da segunda atual) contam; a semana em
+// andamento nunca reseta nada, o usuário tem até domingo pra completar. Recalculado do zero
+// a cada save/delete (mesmo espírito de recomputarGamificacao pros outros números), então
+// lida naturalmente com treinos retroativos preenchendo semanas passadas.
+function recalcularStreakSemanal() {
+  const metaSemanal = getMetaSemanalAtual();
+  const sessoesArr = Object.values(cachedSessoes);
+  if (!metaSemanal || !sessoesArr.length) { gamificacao.streak = 0; return; }
+  const datas = sessoesArr.map(s => new Date(s.data + 'T00:00:00').getTime());
+  const primeiraSegunda = getMonday(new Date(Math.min(...datas)));
+  const segundaAtual = getMonday(new Date());
+  let streak = 0;
+  for (let seg = new Date(primeiraSegunda); seg < segundaAtual; seg.setDate(seg.getDate() + 7)) {
+    const feitos = contarDiasTreinadosNaSemana(seg);
+    streak = feitos >= metaSemanal ? streak + 1 : 0;
+  }
+  gamificacao.streak = streak;
 }
 
 function updateGamificacaoAfterSessao(sessao, isToday) {
@@ -1480,7 +1566,7 @@ function updateGamificacaoAfterSessao(sessao, isToday) {
   gamificacao.nivel = Math.floor(gamificacao.xp / 100) + 1;
   if (gamificacao.nivel > nivelAntes) resultado.subiuNivel = true;
 
-  if (isToday) atualizarStreak(sessao.data);
+  recalcularStreakSemanal();
 
   if (sessao.tipo === 'forca' && sessao.exercicios && sessao.exercicios.length) {
     gamificacao.ranksMusculares = gamificacao.ranksMusculares || {};
@@ -1504,11 +1590,10 @@ function updateGamificacaoAfterSessao(sessao, isToday) {
         resultado.novoRank = { grupoNome: grupoInfo.nome, tierNome: getTierForPoints(r.pontos).nome };
       }
     });
-    // O plano de resistência ativo é o de força só quando o overlay é do modo Ironman ou
-    // objetivo="forca"; caso contrário é o de emagrecimento — cada um com sua própria sequência.
-    const planoRotacao = profile.modoIronman ? planoForca : getPlanoResistenciaAtivo();
-    if (planoRotacao && planoRotacao.sequencia && planoRotacao.sequencia.length) {
-      gamificacao.proximoIndiceForca = ((gamificacao.proximoIndiceForca || 0) + 1) % planoRotacao.sequencia.length;
+    // proximoIndiceForca só existe pro overlay rotativo do Ironman — planos de força/emagrecimento
+    // autônomos agora são fixos por dia da semana (getDiaPlanoParaData), sem rotação.
+    if (profile.modoIronman && planoForca && planoForca.dias && planoForca.dias.length) {
+      gamificacao.proximoIndiceForca = ((gamificacao.proximoIndiceForca || 0) + 1) % planoForca.dias.length;
     }
   }
 
@@ -1572,7 +1657,7 @@ function checkAchievements() {
   if (sessoesArr.some(s => s.tipo === 'corrida' && s.distancia >= 21)) unlock('meia-maratona');
   if (sessoesArr.some(s => s.tipo === 'brick')) unlock('primeiro-brick');
   if (sessoesArr.some(s => s.tipo === 'corrida' && s.pace && s.pace.min < 8)) unlock('pace-sub-8');
-  if ((gamificacao.streak || 0) >= 30) unlock('streak-30');
+  if ((gamificacao.streak || 0) >= 4) unlock('streak-30');
   const hoje = new Date();
   const mesAtual = sessoesArr.filter(s => { const d = new Date(s.data + 'T00:00:00'); return d.getFullYear() === hoje.getFullYear() && d.getMonth() === hoje.getMonth(); });
   if (mesAtual.length >= 10) unlock('dez-treinos-mes');
@@ -2160,9 +2245,9 @@ function renderMaisTab() {
   document.querySelectorAll('#cfg-tema .option-btn').forEach(b => b.classList.toggle('selected', b.dataset.val === (profile.tema || 'dark')));
   document.getElementById('cfg-peso').value = profile.peso || '';
   document.getElementById('cfg-altura').value = profile.altura || '';
-  document.getElementById('plan-forca-info').textContent = planoForca ? ('\u{1F4AA} ' + planoForca.nome + ' — ' + planoForca.duracaoSemanas + ' semanas, dias: ' + planoForca.diasSemana.map(d => DAY_NAMES[d]).join('/')) : 'Nenhum plano de força carregado.';
+  document.getElementById('plan-forca-info').textContent = planoForca ? ('\u{1F4AA} ' + planoForca.nome + ' — ' + planoForca.duracaoSemanas + ' semanas, dias: ' + planoForca.dias.map(d => DAY_NAMES[d.diaSemana]).join('/')) : 'Nenhum plano de força carregado.';
   document.getElementById('plan-emagrecimento-row').classList.toggle('hidden', !planoEmagrecimento);
-  document.getElementById('plan-emagrecimento-info').textContent = planoEmagrecimento ? ('\u{1F525} ' + planoEmagrecimento.nome + ' — ' + planoEmagrecimento.duracaoSemanas + ' semanas, dias: ' + planoEmagrecimento.diasSemana.map(d => DAY_NAMES[d]).join('/')) : '';
+  document.getElementById('plan-emagrecimento-info').textContent = planoEmagrecimento ? ('\u{1F525} ' + planoEmagrecimento.nome + ' — ' + planoEmagrecimento.duracaoSemanas + ' semanas, dias: ' + planoEmagrecimento.dias.map(d => DAY_NAMES[d.diaSemana]).join('/')) : '';
   document.getElementById('plan-ironman-row').classList.toggle('hidden', !profile.modoIronman);
   document.getElementById('plan-ironman-info').textContent = planoIronman ? ('\u{1F3C6} ' + planoIronman.nome + ' — início em ' + fmtShort(new Date(planoIronman.inicio + 'T00:00:00'))) : '';
   if (profile.modoIronman) renderProvasManage();
@@ -2275,13 +2360,14 @@ async function provisionarExerciciosNovos(plano) {
   }
 }
 
-// Confere que cada dia da sequência tem exercícios e que todo exercicioId referenciado
+// Confere que cada dia tem diaSemana + exercícios, e que todo exercicioId referenciado
 // existe na biblioteca (depois de provisionarExerciciosNovos rodar) — em vez de salvar
 // silenciosamente um plano "quebrado" sem exercícios visíveis no checklist.
 function validarSequenciaPlano(plano) {
-  if (!plano.sequencia || !plano.sequencia.length) throw new Error('Plano precisa de ao menos 1 dia em "sequencia".');
+  if (!plano.dias || !plano.dias.length) throw new Error('Plano precisa de ao menos 1 dia em "dias", cada um com diaSemana (0=domingo...6=sábado) e exercicios.');
   const idsFaltando = new Set();
-  plano.sequencia.forEach((dia, i) => {
+  plano.dias.forEach((dia, i) => {
+    if (dia.diaSemana === undefined || dia.diaSemana === null) throw new Error('O dia "' + (dia.nome || i + 1) + '" precisa do campo diaSemana (0=domingo...6=sábado).');
     if (!dia.exercicios || !dia.exercicios.length) throw new Error('O dia "' + (dia.nome || i + 1) + '" está sem exercícios em "exercicios".');
     dia.exercicios.forEach(e => { if (!cachedExercicios[e.exercicioId]) idsFaltando.add(e.exercicioId); });
   });
@@ -2299,7 +2385,7 @@ async function handleImportValidate() {
     let importou = false;
     if (data.forca || data.tipo === 'forca') {
       const plano = data.forca || data;
-      if (!plano.nome || !plano.diasSemana) throw new Error('Plano de força precisa de nome e diasSemana');
+      if (!plano.nome || !plano.dias) throw new Error('Plano de força precisa de nome e dias');
       await provisionarExerciciosNovos(plano);
       validarSequenciaPlano(plano);
       const rec = { tipo: 'forca', ...plano };
@@ -2310,7 +2396,7 @@ async function handleImportValidate() {
     }
     if (data.emagrecimento || data.tipo === 'emagrecimento') {
       const plano = data.emagrecimento || data;
-      if (!plano.nome || !plano.diasSemana) throw new Error('Plano de emagrecimento precisa de nome e diasSemana');
+      if (!plano.nome || !plano.dias) throw new Error('Plano de emagrecimento precisa de nome e dias');
       await provisionarExerciciosNovos(plano);
       validarSequenciaPlano(plano);
       const rec = { tipo: 'emagrecimento', ...plano };
